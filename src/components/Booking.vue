@@ -1,0 +1,264 @@
+<template>
+<v-container grid-list-md>
+    <v-layout>
+        <v-flex xs12 sm12>
+            <h2 class="display-1">HOTEL BOOKINGS</h2>
+            <br>
+        </v-flex>
+    </v-layout>
+    <v-layout row wrap>
+        <v-flex xs4 sm4 v-for="(room, i) in rooms" :key="i">
+            <v-card class="elevation-3" height="100px;" fluid>
+                <v-card-title primary-title 
+                    :class="getStatusColor(room.status)"
+                >
+                    <div>
+                        <h3 class="headline mb-0">{{ room.room_name }}</h3>
+                        <strong>Features: </strong><span>{{ room.room_description }} {{ room.status }}</span><br>
+                    </div>
+                </v-card-title>
+                <v-card-actions>
+                    <v-btn v-if="room.status === '4' || room.status === '5' || room.status === '8'" flat color="orange darken-4">Checkout</v-btn>
+                    <v-btn v-else flat color="blue darken-3">New Booking</v-btn>
+                    <v-spacer></v-spacer>
+                    <v-menu offset-y full-width>
+                        <v-chip slot="activator">
+                            <v-avatar :class="getStatusColor(room.status)"><v-icon>{{ getStatusIcon(room.status) }}</v-icon></v-avatar>
+                            {{ getStatusName(room.status) }}
+                        </v-chip>
+                        <v-list>
+                            <v-chip @click="room.status = '1'">
+                                <v-avatar class="green accent-1"><v-icon>beenhere</v-icon></v-avatar>
+                                    Vacant Ready
+                            </v-chip><br>
+                            <v-chip @click="room.status = '2'">
+                                <v-avatar class="blue accent-1"><v-icon>local_offer</v-icon></v-avatar>
+                                    Vacant Clean
+                            </v-chip><br>
+                            <v-chip @click="room.status = '3'">
+                                <v-avatar class="orange accent-1"><v-icon>bug_report</v-icon></v-avatar>
+                                    Vacant Dirty
+                            </v-chip><br>
+                            <v-chip @click="room.status = '4'">
+                                <v-avatar class="red accent-1"><v-icon>hotel</v-icon></v-avatar>
+                                    Occupied
+                            </v-chip><br>
+                            <v-chip @click="room.status = '5'">
+                                <v-avatar class="red accent-1"><v-icon>do_not_disturb</v-icon></v-avatar>
+                                    Do Not Disturb
+                            </v-chip><br>
+                            <v-chip @click="room.status = '6'">
+                                <v-avatar class="blue-grey lighten-3"><v-icon>build</v-icon></v-avatar>
+                                    Out of Order
+                            </v-chip><br>
+                            <v-chip @click="room.status = '7'">
+                                <v-avatar class="green accent-1"><v-icon>visibility_off</v-icon></v-avatar>
+                                    No Show
+                            </v-chip><br>
+                            <v-chip @click="room.status = '8'">
+                                <v-avatar class="yellow accent-1"><v-icon>access_time</v-icon></v-avatar>
+                                    Due Out
+                            </v-chip>
+                        </v-list>
+                    </v-menu>
+                    <v-btn icon @click.native="room.show = !room.show">
+                        <v-icon>{{ room.show ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+                    </v-btn>
+                </v-card-actions>
+                <room-reservations-list :show="room.show" :reservations="room.reservations"></room-reservations-list>   
+            </v-card>
+        </v-flex>
+    </v-layout>
+</v-container>
+</template>
+
+<script>
+import RoomReservationsList from './layouts/Booking/RoomReservationsList.vue';
+
+export default {
+    name: 'booking',
+    components: { RoomReservationsList },
+    data() {
+        return {
+            rooms: [
+                {
+                    id: '1',
+                    room_name: 'Room 201',
+                    room_description: 'Single Room with Four Single Beds (good for four persons)',
+                    status: '6',
+                    reservations: [
+                        { 
+                            checkin: '02/14/2018',
+                            checkout: '02/14/2018'
+                        }
+                    ],
+                    show: false
+                },
+                {
+                    id: '2',
+                    room_name: 'Room 202',
+                    room_description: 'Single Room with One Twin/Double Bed (good for one to two persons)',
+                    status: '1',
+                    reservations: [
+                        { 
+                            checkin: '02/14/2018',
+                            checkout: '02/14/2018'
+                        }
+                    ],
+                    show: false
+                },
+                {
+                    id: '3',
+                    room_name: 'Room 203',
+                    room_description: 'Single Room with Two Twin/Double Bed (good for two to four persons)',
+                    status: '4',
+                    reservations: [
+                        { 
+                            checkin: '02/14/2018',
+                            checkout: '02/14/2018'
+                        }
+                    ],
+                    show: false
+                },
+                {
+                    id: '4',
+                    room_name: 'Room 301',
+                    room_description: 'Dormitory Rooms with Four Bunk Beds (good for four to eight persons)',
+                    status: '5',
+                    reservations: [
+                        { 
+                            checkin: '02/14/2018',
+                            checkout: '02/14/2018'
+                        }
+                    ],
+                    show: false
+                },
+                {
+                    id: '5',
+                    room_name: 'Room 302',
+                    room_description: 'Dormitory Rooms with Four Bunk Beds (good for four to eight persons)',
+                    status: '8',
+                    reservations: [
+                        { 
+                            checkin: '02/14/2018',
+                            checkout: '02/14/2018'
+                        }
+                    ],
+                    show: false
+                },
+                {
+                    id: '6',
+                    room_name: 'Room 303',
+                    room_description: 'Single Room with One Double Bed and Fully Equipped Kitchenette (good for one to two persons)',
+                    status: '3',
+                    reservations: [
+                        { 
+                            checkin: '02/14/2018',
+                            checkout: '02/14/2018'
+                        }
+                    ],
+                    show: false
+                }
+            ],
+            status: ''
+        }
+    },
+    methods: {
+        getStatusColor(status) {
+            let status_color = ''
+            if(status === '1') {
+                status_color = 'green accent-1'
+            }
+            else if(status === '2') {
+                status_color = 'blue accent-1'
+            }
+            else if(status === '3') {
+                status_color = 'orange accent-1'
+            }
+            else if(status === '4') {
+                status_color = 'red accent-1'
+            }
+            else if(status === '5') {
+                status_color = 'red accent-1'
+            }
+            else if(status === '6') {
+                status_color = 'blue-grey lighten-3'
+            }
+            else if(status === '7') {
+                status_color = 'green accent-1'
+            }
+            else if(status === '8') {
+                status_color = 'yellow accent-1'
+            }
+
+            return status_color;
+        },
+        getStatusIcon(status) {
+            let status_icon = ''
+            if(status === '1') {
+                status_icon = 'beenhere'
+            }
+            else if(status === '2') {
+                status_icon = 'local_offer'
+            }
+            else if(status === '3') {
+                status_icon = 'bug_report'
+            }
+            else if(status === '4') {
+                status_icon = 'hotel'
+            }
+            else if(status === '5') {
+                status_icon = 'do_not_disturb'
+            }
+            else if(status === '6') {
+                status_icon = 'build'
+            }
+            else if(status === '7') {
+                status_icon = 'visibility_off'
+            }
+            else if(status === '8') {
+                status_icon = 'access_time'
+            }
+
+            return status_icon;
+        },
+        getStatusName(status) {
+            let status_name = ''
+            if(status === '1') {
+                status_name = 'Vacant Ready'
+            }
+            else if(status === '2') {
+                status_name = 'Vacant Clean'
+            }
+            else if(status === '3') {
+                status_name = 'Vacant Dirty'
+            }
+            else if(status === '4') {
+                status_name = 'Occupied'
+            }
+            else if(status === '5') {
+                status_name = 'Do not Disturb'
+            }
+            else if(status === '6') {
+                status_name = 'Out of Order'
+            }
+            else if(status === '7') {
+                status_name = 'No Show'
+            }
+            else if(status === '8') {
+                status_name = 'Due Out'
+            }
+
+            return status_name;
+        },
+        changeStatus(i) {
+            //this.status = status
+            console.log(this.rooms.status)
+        }
+        
+    },
+    computed: {
+        
+    }
+}
+</script>
