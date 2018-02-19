@@ -8,13 +8,14 @@
     </v-layout>
     <v-layout row wrap>
         <v-flex xs4 sm4 v-for="(room, i) in rooms" :key="i">
-            <v-card class="elevation-3" height="100px;" fluid>
+            <v-card class="elevation-3" fluid>
                 <v-card-title primary-title 
                     :class="getStatusColor(room.status)"
                 >
-                    <div>
+                    <div style="min-height:110px">
                         <h3 class="headline mb-0">{{ room.room_name }}</h3>
-                        <strong>Features: </strong><span>{{ room.room_description }} {{ room.status }}</span><br>
+                        <strong>Features: </strong><span>{{ room.room_description }}</span><br>
+                        <strong>Capacity: </strong><span>{{ room.capacity }}</span><br>
                     </div>
                 </v-card-title>
                 <v-card-actions>
@@ -84,7 +85,8 @@ export default {
                 {
                     id: '1',
                     room_name: 'Room 201',
-                    room_description: 'Single Room with Four Single Beds (good for four persons)',
+                    room_description: 'Single Room with Four Single Beds',
+                    capacity: 'Good for four persons',
                     status: '6',
                     reservations: [
                         { 
@@ -97,7 +99,8 @@ export default {
                 {
                     id: '2',
                     room_name: 'Room 202',
-                    room_description: 'Single Room with One Twin/Double Bed (good for one to two persons)',
+                    room_description: 'Single Room with One Twin/Double Bed',
+                    capacity: 'Good for one to two persons',
                     status: '1',
                     reservations: [
                         { 
@@ -110,7 +113,8 @@ export default {
                 {
                     id: '3',
                     room_name: 'Room 203',
-                    room_description: 'Single Room with Two Twin/Double Bed (good for two to four persons)',
+                    room_description: 'Single Room with Two Twin/Double Bed',
+                    capacity: 'Good for two to four persons',
                     status: '4',
                     reservations: [
                         { 
@@ -123,7 +127,8 @@ export default {
                 {
                     id: '4',
                     room_name: 'Room 301',
-                    room_description: 'Dormitory Rooms with Four Bunk Beds (good for four to eight persons)',
+                    room_description: 'Dormitory Rooms with Four Bunk Beds',
+                    capacity: 'Good for four to eight persons',
                     status: '5',
                     reservations: [
                         { 
@@ -136,7 +141,8 @@ export default {
                 {
                     id: '5',
                     room_name: 'Room 302',
-                    room_description: 'Dormitory Rooms with Four Bunk Beds (good for four to eight persons)',
+                    room_description: 'Dormitory Rooms with Four Bunk Beds',
+                    capacity: 'Good for four to eight persons',
                     status: '8',
                     reservations: [
                         { 
@@ -149,7 +155,8 @@ export default {
                 {
                     id: '6',
                     room_name: 'Room 303',
-                    room_description: 'Single Room with One Double Bed and Fully Equipped Kitchenette (good for one to two persons)',
+                    room_description: 'Single Room with One Double Bed and Fully Equipped Kitchenette',
+                    capacity: 'Good for one to two persons',
                     status: '3',
                     reservations: [
                         { 
