@@ -16,7 +16,7 @@
                     </v-flex>
                 </v-layout>
                 <v-list-group v-else-if="item.children" v-model="item.model" no-action>
-                    <v-list-tile slot="item" @click="">
+                    <v-list-tile slot="item">
                         <v-list-tile-action>
                             <v-icon>{{ item.model ? item.icon : item['icon-alt'] }}</v-icon>
                         </v-list-tile-action>
@@ -29,7 +29,7 @@
                     <v-list-tile
                         v-for="(child, i) in item.children"
                         :key="i"
-                        @click=""
+                        :to="child.route"
                     >
                         <v-list-tile-action v-if="child.icon">
                             <v-icon>{{ child.icon }}</v-icon>
@@ -41,7 +41,7 @@
                         </v-list-tile-content>
                     </v-list-tile>
                 </v-list-group>
-                <v-list-tile v-else @click="" :value="item.active">
+                <v-list-tile v-else :to="item.route" :value="item.active">
                     <v-list-tile-action>
                         <v-icon>{{ item.icon }}</v-icon>
                     </v-list-tile-action>
@@ -62,17 +62,17 @@ export default {
     data() {
         return {
             items: [
-                { icon: 'book', text: 'Booking', active: true },
-                { icon: 'date_range', text: 'Reservation', active: false },
+                { icon: 'book', text: 'Booking', route: '/booking', active: false },
+                { icon: 'date_range', text: 'Reservation', route: '/reservation', active: false },
                 {
                 icon: 'keyboard_arrow_up',
                 'icon-alt': 'keyboard_arrow_down',
                 text: 'Information Manager',
                 model: false,
                 children: [
-                    { icon: 'people', text: 'Customers', active: false },
-                    { icon: 'style', text: 'Rooms', active: false },
-                    { icon: 'lock', text: 'Accounts', active: false }
+                    { icon: 'people', text: 'Customers', route: '/customers', active: false },
+                    { icon: 'style', text: 'Rooms', route: '/rooms', active: false },
+                    { icon: 'lock', text: 'Accounts', route: '/accounts', active: false }
                 ]
                 }
             ]

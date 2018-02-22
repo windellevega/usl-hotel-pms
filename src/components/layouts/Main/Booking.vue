@@ -1,80 +1,80 @@
 <template>
-<v-container grid-list-md>
-    <v-layout>
-        <v-flex xs12 sm12>
-            <h2 class="display-1">HOTEL BOOKINGS</h2>
-            <br>
-        </v-flex>
-    </v-layout>
-    <v-layout row wrap>
-        <v-flex xs4 sm4 v-for="(room, i) in rooms" :key="i">
-            <v-card class="elevation-3" fluid>
-                <v-card-title primary-title 
-                    :class="getStatusColor(room.status)"
-                >
-                    <div style="min-height:110px">
-                        <h3 class="headline mb-0">{{ room.room_name }}</h3>
-                        <strong>Features: </strong><span>{{ room.room_description }}</span><br>
-                        <strong>Capacity: </strong><span>{{ room.capacity }}</span><br>
-                    </div>
-                </v-card-title>
-                <v-card-actions>
-                    <v-btn v-if="room.status === '4' || room.status === '5' || room.status === '8'" flat color="orange darken-4">Checkout</v-btn>
-                    <v-btn v-else flat color="blue darken-3">New Booking</v-btn>
-                    <v-spacer></v-spacer>
-                    <v-menu offset-y full-width>
-                        <v-chip slot="activator">
-                            <v-avatar :class="getStatusColor(room.status)"><v-icon>{{ getStatusIcon(room.status) }}</v-icon></v-avatar>
-                            {{ getStatusName(room.status) }}
-                        </v-chip>
-                        <v-list>
-                            <v-chip @click="room.status = '1'">
-                                <v-avatar class="green accent-1"><v-icon>beenhere</v-icon></v-avatar>
-                                    Vacant Ready
-                            </v-chip><br>
-                            <v-chip @click="room.status = '2'">
-                                <v-avatar class="blue accent-1"><v-icon>local_offer</v-icon></v-avatar>
-                                    Vacant Clean
-                            </v-chip><br>
-                            <v-chip @click="room.status = '3'">
-                                <v-avatar class="orange accent-1"><v-icon>bug_report</v-icon></v-avatar>
-                                    Vacant Dirty
-                            </v-chip><br>
-                            <v-chip @click="room.status = '4'">
-                                <v-avatar class="red accent-1"><v-icon>hotel</v-icon></v-avatar>
-                                    Occupied
-                            </v-chip><br>
-                            <v-chip @click="room.status = '5'">
-                                <v-avatar class="red accent-1"><v-icon>do_not_disturb</v-icon></v-avatar>
-                                    Do Not Disturb
-                            </v-chip><br>
-                            <v-chip @click="room.status = '6'">
-                                <v-avatar class="blue-grey lighten-3"><v-icon>build</v-icon></v-avatar>
-                                    Out of Order
-                            </v-chip><br>
-                            <v-chip @click="room.status = '7'">
-                                <v-avatar class="green accent-1"><v-icon>visibility_off</v-icon></v-avatar>
-                                    No Show
-                            </v-chip><br>
-                            <v-chip @click="room.status = '8'">
-                                <v-avatar class="yellow accent-1"><v-icon>access_time</v-icon></v-avatar>
-                                    Due Out
+    <v-container grid-list-md>
+        <v-layout>
+            <v-flex xs12 sm12>
+                <h2 class="display-1">HOTEL BOOKINGS</h2>
+                <br>
+            </v-flex>
+        </v-layout>
+        <v-layout row wrap>
+            <v-flex xs4 sm4 v-for="(room, i) in rooms" :key="i">
+                <v-card class="elevation-3" fluid>
+                    <v-card-title primary-title 
+                        :class="getStatusColor(room.status)"
+                    >
+                        <div style="min-height:110px">
+                            <h3 class="headline mb-0">{{ room.room_name }}</h3>
+                            <strong>Features: </strong><span>{{ room.room_description }}</span><br>
+                            <strong>Capacity: </strong><span>{{ room.capacity }}</span><br>
+                        </div>
+                    </v-card-title>
+                    <v-card-actions>
+                        <v-btn v-if="room.status === '4' || room.status === '5' || room.status === '8'" flat color="orange darken-4">Checkout</v-btn>
+                        <v-btn v-else flat color="blue darken-3">New Booking</v-btn>
+                        <v-spacer></v-spacer>
+                        <v-menu offset-y full-width>
+                            <v-chip slot="activator">
+                                <v-avatar :class="getStatusColor(room.status)"><v-icon>{{ getStatusIcon(room.status) }}</v-icon></v-avatar>
+                                {{ getStatusName(room.status) }}
                             </v-chip>
-                        </v-list>
-                    </v-menu>
-                    <v-btn icon @click.native="room.show = !room.show">
-                        <v-icon>{{ room.show ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
-                    </v-btn>
-                </v-card-actions>
-                <room-reservations-list :show="room.show" :reservations="room.reservations"></room-reservations-list>   
-            </v-card>
-        </v-flex>
-    </v-layout>
-</v-container>
+                            <v-list>
+                                <v-chip @click="room.status = '1'">
+                                    <v-avatar class="green accent-1"><v-icon>beenhere</v-icon></v-avatar>
+                                        Vacant Ready
+                                </v-chip><br>
+                                <v-chip @click="room.status = '2'">
+                                    <v-avatar class="blue accent-1"><v-icon>local_offer</v-icon></v-avatar>
+                                        Vacant Clean
+                                </v-chip><br>
+                                <v-chip @click="room.status = '3'">
+                                    <v-avatar class="orange accent-1"><v-icon>bug_report</v-icon></v-avatar>
+                                        Vacant Dirty
+                                </v-chip><br>
+                                <v-chip @click="room.status = '4'">
+                                    <v-avatar class="red accent-1"><v-icon>hotel</v-icon></v-avatar>
+                                        Occupied
+                                </v-chip><br>
+                                <v-chip @click="room.status = '5'">
+                                    <v-avatar class="red accent-1"><v-icon>do_not_disturb</v-icon></v-avatar>
+                                        Do Not Disturb
+                                </v-chip><br>
+                                <v-chip @click="room.status = '6'">
+                                    <v-avatar class="blue-grey lighten-3"><v-icon>build</v-icon></v-avatar>
+                                        Out of Order
+                                </v-chip><br>
+                                <v-chip @click="room.status = '7'">
+                                    <v-avatar class="green accent-1"><v-icon>visibility_off</v-icon></v-avatar>
+                                        No Show
+                                </v-chip><br>
+                                <v-chip @click="room.status = '8'">
+                                    <v-avatar class="yellow accent-1"><v-icon>access_time</v-icon></v-avatar>
+                                        Due Out
+                                </v-chip>
+                            </v-list>
+                        </v-menu>
+                        <v-btn icon @click.native="room.show = !room.show">
+                            <v-icon>{{ room.show ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+                        </v-btn>
+                    </v-card-actions>
+                    <room-reservations-list :show="room.show" :reservations="room.reservations"></room-reservations-list>   
+                </v-card>
+            </v-flex>
+        </v-layout>
+    </v-container>
 </template>
 
 <script>
-import RoomReservationsList from './layouts/Booking/RoomReservationsList.vue';
+import RoomReservationsList from './../Booking/RoomReservationsList.vue';
 
 export default {
     name: 'booking',
