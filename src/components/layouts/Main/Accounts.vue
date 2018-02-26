@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div transition="slide-y-transition">
     <v-dialog v-model="dialog" max-width="500px">
       <v-btn color="primary" dark slot="activator" class="mb-2">New Account</v-btn>
       <v-card>
