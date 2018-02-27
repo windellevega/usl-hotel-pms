@@ -1,8 +1,7 @@
 <template>
     
         <v-list dense>
-            <template v-for="(item, i) in items">
-                <div>
+            <div v-for="(item, i) in items" :key="i">
                 <v-layout
                     row
                     v-if="item.heading"
@@ -51,8 +50,7 @@
                         </v-list-tile-title>
                     </v-list-tile-content>
                 </v-list-tile>
-                </div>
-            </template>
+            </div>
         </v-list>  
 </template>
 

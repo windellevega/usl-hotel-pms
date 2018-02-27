@@ -6,8 +6,11 @@
             app
             v-model="drawer"
         >
+
             <app-nav-list></app-nav-list>
+
         </v-navigation-drawer>
+        
         <v-toolbar
             color="blue darken-3"
             dark
@@ -15,7 +18,10 @@
             clipped-left
             fixed
         >
-            <v-toolbar-title :style="$vuetify.breakpoint.smAndUp ? 'width: 300px; min-width: 250px' : 'min-width: 72px'" class="ml-0 pl-3">
+            <v-toolbar-title 
+                :style="$vuetify.breakpoint.smAndUp ? 'width: 300px; min-width: 250px' : 'min-width: 72px'" 
+                class="ml-0 pl-3"
+            >
                 <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
                 <v-btn icon large>
                     <img height="45px;" src="../../static/logo.png">
@@ -32,11 +38,21 @@
                 </v-btn>
             </div>
         </v-toolbar>
+
         <v-content>
             <v-container fluid>
+
                 <router-view></router-view>
+                
             </v-container>
+
         </v-content>
+        <v-footer color="grey darken-3" app :fixed="true">
+            <v-flex xs12 py-2 text-xs-center>
+                <span style="color:#cecece"><strong>Center for Information and Communications Technology</strong> &copy; 2018</span><br>
+                <span style="color:#898989">Developed and Maintained by: W.J.G. Vega (Software Developer)</span>
+            </v-flex>
+        </v-footer>
     </v-app>
 </template>
 

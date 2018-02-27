@@ -19,26 +19,45 @@
                         </div>
                     </v-card-title>
                     <v-card-actions>
-                        <v-btn v-if="room.status_history[0].status_id === 4 || room.status_history[0].status_id === 5 || room.status_history[0].status_id === 8" flat color="orange darken-4">Checkout</v-btn>
+                        <v-btn 
+                            v-if="room.status_history[0].status_id === 4 
+                                    || room.status_history[0].status_id === 5 
+                                    || room.status_history[0].status_id === 8" 
+                            flat color="orange darken-4"
+                        >
+                            Checkout
+                        </v-btn>
                         <v-btn v-else flat color="blue darken-3">New Booking</v-btn>
                         <v-spacer></v-spacer>
                         <v-menu offset-y full-width>
                             <v-chip slot="activator">
-                                <v-avatar :class="getStatusColor(room.status_history[0].status_id)"><v-icon>{{ getStatusIcon(room.status_history[0].status_id) }}</v-icon></v-avatar>
+                                <v-avatar :class="getStatusColor(room.status_history[0].status_id)">
+                                    <v-icon>{{ getStatusIcon(room.status_history[0].status_id) }}</v-icon>
+                                </v-avatar>
                                 {{ getStatusName(room.status_history[0].status_id) }}
                             </v-chip>
+            
                             <room-status-list 
                                 @changestatus="room.status_history[0].status_id = $event" 
                                 :currstat="room.status_history[0].status_id" 
                                 :roomid="room.id"
                             >
                             </room-status-list>
+
                         </v-menu>
                         <v-btn icon @click.native="room.show = !room.show">
-                            <v-icon>{{ room.show ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}</v-icon>
+                            <v-icon>
+                                {{ room.show ? 'keyboard_arrow_down' : 'keyboard_arrow_up' }}
+                            </v-icon>
                         </v-btn>
                     </v-card-actions>
-                    <room-reservations-list :show="room.show" :roomid="room.id"></room-reservations-list>   
+
+                    <room-reservations-list 
+                        :show="room.show" 
+                        :roomid="room.id"
+                    >
+                    </room-reservations-list>   
+
                 </v-card>
             </v-flex>
             <v-btn
