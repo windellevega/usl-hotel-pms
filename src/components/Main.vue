@@ -37,20 +37,6 @@
                 <router-view></router-view>
             </v-container>
         </v-content>
-        <v-btn
-            fab
-            bottom
-            right
-            color="primary"
-            dark
-            fixed
-            @click.stop="dialog = !dialog"
-        >
-            <v-icon>add</v-icon>
-        </v-btn>
-        <v-dialog v-model="dialog" width="800px">
-            
-        </v-dialog>
     </v-app>
 </template>
 
@@ -60,7 +46,6 @@
     export default {
         data() {
             return {
-                dialog: false,
                 drawer: null
             }
         },

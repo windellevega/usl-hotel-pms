@@ -4,7 +4,10 @@
             <v-layout>
                 <v-flex xs12>
                     <strong>RESERVATIONS</strong><br>
-                    <span v-for="reservation in reservations">{{reservation.checkin}} to {{ reservation.checkout }}<br></span>
+                    <span v-if="reservations.message != null">{{ reservations.message }}</span>
+                    <span v-else v-for="(reservation, i) in reservations" :key="i">
+                        <span> {{reservation.checkin}} to {{ reservation.checkout }}<br></span>
+                    </span>
                 </v-flex>
             </v-layout>
         </v-card-text>
@@ -12,8 +15,31 @@
 </template>
 
 <script>
+import axios from 'axios'
+
+axios.defaults.baseURL = 'http://localhost:8000';
+
 export default {
     name: 'room-reservations-list',
-    props: ['show', 'reservations']
+    props: ['show', 'roomid'],
+    data() {
+        return {
+            reservations: {
+                0: {
+                    checkin: null,
+                    checkout: null
+                }
+            }
+        }
+    },
+    created() {
+        axios.get('/api/room/reservationdates/' + this.roomid)
+            .then(response => {
+                this.reservations = response.data
+            })
+            .catch(error => {
+                console.log(error.message)
+            })
+    }
 }
 </script>
