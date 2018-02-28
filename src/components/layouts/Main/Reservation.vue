@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-dialog v-model="dialog" max-width="700px">
+        <v-dialog persistent v-model="dialog" max-width="700px">
             <v-btn color="primary" dark slot="activator" class="mb-2">New Reservation</v-btn>
             <v-card>
                 <v-card-title>
@@ -61,7 +61,7 @@
                                         prepend-icon="access_time"
                                         readonly
                                     ></v-text-field>
-                                    <v-time-picker v-model="editedItem.checkintime" @focus="$refs.menu.save(editedItem.checkintime)"></v-time-picker>
+                                    <v-time-picker v-model="editedItem.checkintime" @change="$refs.menu.save(editedItem.checkintime)"></v-time-picker>
                                 </v-menu>
                             </v-flex>
                             
@@ -104,7 +104,7 @@
             </td>
         </template>
         <template slot="no-data">
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
+            <td colspan="7" class="text-xs-center">There are no reservations to show.</td>
         </template>
         </v-data-table>
     </div>
