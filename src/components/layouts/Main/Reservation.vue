@@ -1,85 +1,136 @@
 <template>
-  <div>
-    <v-dialog v-model="dialog" max-width="500px">
-      <v-btn color="primary" dark slot="activator" class="mb-2">New Reservation</v-btn>
-      <v-card>
-        <v-card-title>
-          <span class="headline">{{ formTitle }}</span>
-        </v-card-title>
-        <v-card-text>
-          <v-container grid-list-md>
-            <v-layout wrap>
-              <v-flex xs12 sm6 md4>
-                <v-text-field label="Dessert name" v-model="editedItem.name"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm6 md4>
-                <v-text-field label="Calories" v-model="editedItem.calories"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm6 md4>
-                <v-text-field label="Fat (g)" v-model="editedItem.fat"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm6 md4>
-                <v-text-field label="Carbs (g)" v-model="editedItem.carbs"></v-text-field>
-              </v-flex>
-              <v-flex xs12 sm6 md4>
-                <v-text-field label="Protein (g)" v-model="editedItem.protein"></v-text-field>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
-          <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <v-data-table
-      :headers="headers"
-      :items="items"
-      hide-actions
-      class="elevation-1"
-    >
-      <template slot="items" slot-scope="props">
-        <td>{{ props.item.name }}</td>
-        <td class="text-xs-right">{{ props.item.calories }}</td>
-        <td class="text-xs-right">{{ props.item.fat }}</td>
-        <td class="text-xs-right">{{ props.item.carbs }}</td>
-        <td class="text-xs-right">{{ props.item.protein }}</td>
-        <td class="justify-center layout px-0">
-          <v-btn icon class="mx-0" @click="editItem(props.item)">
-            <v-icon color="teal">edit</v-icon>
-          </v-btn>
-          <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-            <v-icon color="red accent-3">delete</v-icon>
-          </v-btn>
-        </td>
-      </template>
-      <template slot="no-data">
-        <v-btn color="primary" @click="initialize">Reset</v-btn>
-      </template>
-    </v-data-table>
-  </div>
+    <div>
+        <v-dialog v-model="dialog" max-width="700px">
+            <v-btn color="primary" dark slot="activator" class="mb-2">New Reservation</v-btn>
+            <v-card>
+                <v-card-title>
+                    <span class="headline">{{ formTitle }}</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-container grid-list-md>
+                        <v-layout wrap>
+                            <v-flex xs12 sm12 md12>
+                                <v-select
+                                    :items="guests"
+                                    label="Select Guest"
+                                    single-line
+                                    bottom
+                                ></v-select>
+                            </v-flex>
+                            <v-flex xs12 sm12 md6>
+                                <v-menu
+                                    ref="menu"
+                                    lazy
+                                    :close-on-content-click="true"
+                                    transition="scale-transition"
+                                    offset-y
+                                    full-width
+                                    :nudge-right="40"
+                                    min-width="290px"
+                                    :return-value.sync="editedItem.checkindate"
+                                >
+                                    <v-text-field
+                                        slot="activator"
+                                        label="Arrival Date"
+                                        v-model="editedItem.checkindate"
+                                        prepend-icon="event"
+                                        readonly
+                                    ></v-text-field>
+                                    <v-date-picker 
+                                        v-model="editedItem.checkindate" 
+                                        scrollable></v-date-picker>
+                                </v-menu>
+                            </v-flex>
+                            <v-flex xs11 sm5>
+                                <v-menu
+                                    ref="menu"
+                                    lazy
+                                    :close-on-content-click="false"
+                                    transition="scale-transition"
+                                    offset-y
+                                    full-width
+                                    :nudge-right="40"
+                                    max-width="290px"
+                                    min-width="290px"
+                                    :return-value.sync="editedItem.checkintime"
+                                >
+                                    <v-text-field
+                                        slot="activator"
+                                        label="Picker in menu"
+                                        v-model="editedItem.checkintime"
+                                        prepend-icon="access_time"
+                                        readonly
+                                    ></v-text-field>
+                                    <v-time-picker v-model="editedItem.checkintime" @focus="$refs.menu.save(editedItem.checkintime)"></v-time-picker>
+                                </v-menu>
+                            </v-flex>
+                            
+                            <v-flex xs12 sm12 md6>
+                                <v-text-field label="Carbs (g)" v-model="editedItem.carbs"></v-text-field>
+                            </v-flex>
+                            <v-flex xs12 sm12 md6>
+                                <v-text-field label="Protein (g)" v-model="editedItem.protein"></v-text-field>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
+                    <v-btn color="blue darken-1" flat @click.native="saveReservation">Save</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-data-table
+        :headers="headers"
+        :items="reservations"
+        hide-actions
+        class="elevation-1"
+        >
+        <template slot="items" slot-scope="props">
+            <td class="text-xs-center">{{ props.item.room.room_name }}</td>
+            <td class="text-xs-right">{{ props.item.guest.firstname }} {{ props.item.guest.lastname }}</td>
+            <td class="text-xs-right">{{ props.item.booking_type.bookingtype }}</td>
+            <td class="text-xs-right">{{ props.item.checkin }}</td>
+            <td class="text-xs-right">{{ props.item.checkout }}</td>
+            <td class="text-xs-right">₱ {{ props.item.bookingcharge }}</td>
+            <td class="justify-center layout px-0">
+            <v-btn icon class="mx-0" @click="editItem(props.item)">
+                <v-icon color="teal">edit</v-icon>
+            </v-btn>
+            <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+                <v-icon color="red accent-3">delete</v-icon>
+            </v-btn>
+            </td>
+        </template>
+        <template slot="no-data">
+            <v-btn color="primary" @click="initialize">Reset</v-btn>
+        </template>
+        </v-data-table>
+    </div>
 </template>
 
 <script>
+    import axios from 'axios'
+
+    axios.defaults.baseURL = 'http://localhost:8000';
+    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+    axios.defaults.headers.common['Accept'] = 'application/json';
   export default {
     data: () => ({
       dialog: false,
       headers: [
         {
-          text: 'Dessert (100g serving)',
-          align: 'left',
-          sortable: false,
-          value: 'name'
+          text: 'Room Name', value: 'roomname'
         },
-        { text: 'Calories', value: 'calories' },
-        { text: 'Fat (g)', value: 'fat' },
-        { text: 'Carbs (g)', value: 'carbs' },
-        { text: 'Protein (g)', value: 'protein' },
+        { text: 'Guest Name', value: 'guestname' },
+        { text: 'Booking Type', value: 'booktype' },
+        { text: 'Check-In', value: 'checkin' },
+        { text: 'Check-Out', value: 'checkout' },
+        { text: 'Booking Charge', value: 'bookcharge' },
         { text: 'Actions', value: 'name', sortable: false }
       ],
-      items: [],
+      reservations: [],
       editedIndex: -1,
       editedItem: {
         name: '',
@@ -94,12 +145,13 @@
         fat: 0,
         carbs: 0,
         protein: 0
-      }
+      },
+      guests: []
     }),
 
     computed: {
       formTitle () {
-        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+        return this.editedIndex === -1 ? 'New Reservation' : 'Edit Reservation'
       }
     },
 
@@ -115,89 +167,37 @@
 
     methods: {
       initialize () {
-        this.items = [
-          {
-            name: 'Frozen Yogurt',
-            calories: 159,
-            fat: 6.0,
-            carbs: 24,
-            protein: 4.0
-          },
-          {
-            name: 'Ice cream sandwich',
-            calories: 237,
-            fat: 9.0,
-            carbs: 37,
-            protein: 4.3
-          },
-          {
-            name: 'Eclair',
-            calories: 262,
-            fat: 16.0,
-            carbs: 23,
-            protein: 6.0
-          },
-          {
-            name: 'Cupcake',
-            calories: 305,
-            fat: 3.7,
-            carbs: 67,
-            protein: 4.3
-          },
-          {
-            name: 'Gingerbread',
-            calories: 356,
-            fat: 16.0,
-            carbs: 49,
-            protein: 3.9
-          },
-          {
-            name: 'Jelly bean',
-            calories: 375,
-            fat: 0.0,
-            carbs: 94,
-            protein: 0.0
-          },
-          {
-            name: 'Lollipop',
-            calories: 392,
-            fat: 0.2,
-            carbs: 98,
-            protein: 0
-          },
-          {
-            name: 'Honeycomb',
-            calories: 408,
-            fat: 3.2,
-            carbs: 87,
-            protein: 6.5
-          },
-          {
-            name: 'Donut',
-            calories: 452,
-            fat: 25.0,
-            carbs: 51,
-            protein: 4.9
-          },
-          {
-            name: 'KitKat',
-            calories: 518,
-            fat: 26.0,
-            carbs: 65,
-            protein: 7
-          }
-        ]
+        axios.get('/api/reservations')
+            .then(response => {
+                this.reservations = response.data
+            })
+            .catch(error => {
+                console.log(error.message)
+            })
+        
+        axios.get('/api/guests')
+            .then(response => {
+                var item = []
+                response.data.forEach(function(element, i) {
+                    item.push({text: element.fullname + ' (' + element.guest_type.guesttype + ') - ' + element.company.companyname, value: element.id})
+                })
+                this.guests = item
+            })
+            .catch(error => {
+                console.log(error.message)
+            })
       },
 
       editItem (item) {
-        this.editedIndex = this.items.indexOf(item)
+        this.editedIndex = this.reservations.indexOf(item)
         this.editedItem = Object.assign({}, item)
         this.dialog = true
+        console.log(this.editedItem)
       },
 
       deleteItem (item) {
-        const index = this.items.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && this.items.splice(index, 1)
+        const index = this.reservations.indexOf(item)
+        confirm('Are you sure you want to delete this item?') && this.reservations.splice(index, 1)
       },
 
       close () {
@@ -208,12 +208,9 @@
         }, 300)
       },
 
-      save () {
-        if (this.editedIndex > -1) {
-          Object.assign(this.items[this.editedIndex], this.editedItem)
-        } else {
-          this.items.push(this.editedItem)
-        }
+      saveReservation () {
+        alert(this.editedItem.checkindate)
+        alert(this.editedItem.checkintime)
         this.close()
       }
     }

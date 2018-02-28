@@ -49,8 +49,8 @@
         </v-content>
         <v-footer color="grey darken-3" app :fixed="true">
             <v-flex xs12 py-2 text-xs-center>
-                <span style="color:#cecece"><strong>Center for Information and Communications Technology</strong> &copy; 2018</span><br>
-                <span style="color:#898989">Developed and Maintained by: W.J.G. Vega (Software Developer)</span>
+                <span style="color:#cecece"><strong>USL Center for Information and Communications Technology</strong> &copy; 2018</span><br>
+                <span class="caption font-weight 400" style="color:#898989">Developed and Maintained by: W.J.G. Vega (Software Developer)</span>
             </v-flex>
         </v-footer>
     </v-app>

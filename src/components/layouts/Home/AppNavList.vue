@@ -51,6 +51,15 @@
                     </v-list-tile-content>
                 </v-list-tile>
             </div>
+            <v-layout>
+                <v-flex py-2 style="padding-left:4px;">
+                    <v-date-picker 
+                        color="primary" 
+                        header-color="blue darken-3"
+                    >
+                    </v-date-picker>
+                </v-flex>
+            </v-layout>
         </v-list>  
 </template>
 
@@ -66,7 +75,7 @@ export default {
                 icon: 'keyboard_arrow_up',
                 'icon-alt': 'keyboard_arrow_down',
                 text: 'Information Manager',
-                model: false,
+                model: true,
                 children: [
                     { icon: 'people', text: 'Customers', route: '/customers', active: false },
                     { icon: 'style', text: 'Rooms', route: '/rooms', active: false },
