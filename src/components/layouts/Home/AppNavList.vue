@@ -56,6 +56,7 @@
                     <v-date-picker 
                         color="primary" 
                         header-color="blue darken-3"
+                        v-model="date"
                     >
                     </v-date-picker>
                 </v-flex>
@@ -68,6 +69,7 @@ export default {
     name: 'app-nav-list',
     data() {
         return {
+            date: null,
             items: [
                 { icon: 'book', text: 'Booking', route: '/booking', active: false },
                 { icon: 'date_range', text: 'Reservation', route: '/reservation', active: false },
@@ -87,6 +89,10 @@ export default {
     },
     props: {
         source: String
+    },
+    created() {
+        var today = new Date()
+        this.date = today.toISOString().substr(0,10)
     }
 }
 </script>
