@@ -14,14 +14,16 @@
                         </v-subheader>
                     </v-flex>
                 </v-layout>
-                <v-list-group v-else-if="item.children" v-model="item.model" no-action>
-                    <v-list-tile slot="item">
-                        <v-list-tile-action>
-                            <v-icon>{{ item.model ? item.icon : item['icon-alt'] }}</v-icon>
-                        </v-list-tile-action>
+                <v-list-group 
+                    v-else-if="item.children"
+                    v-model="item.model"
+                    :key="item.text"
+                    :prepend-icon="item.model ? item.icon : item['icon-alt']"
+                    append-icon="">
+                    <v-list-tile slot="activator">
                         <v-list-tile-content>
                             <v-list-tile-title>
-                            {{ item.text }}
+                                {{ item.text }}
                             </v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile>
@@ -35,7 +37,7 @@
                         </v-list-tile-action>
                         <v-list-tile-content>
                             <v-list-tile-title>
-                            {{ child.text }}
+                                {{ child.text }}
                             </v-list-tile-title>
                         </v-list-tile-content>
                     </v-list-tile>
@@ -56,7 +58,7 @@
                     <v-date-picker 
                         color="primary" 
                         header-color="blue darken-3"
-                        v-model="date"
+                        v-model="today"
                     >
                     </v-date-picker>
                 </v-flex>
@@ -69,7 +71,7 @@ export default {
     name: 'app-nav-list',
     data() {
         return {
-            date: null,
+            today: null,
             items: [
                 { icon: 'book', text: 'Booking', route: '/booking', active: false },
                 { icon: 'date_range', text: 'Reservation', route: '/reservation', active: false },
@@ -91,8 +93,20 @@ export default {
         source: String
     },
     created() {
-        var today = new Date()
-        this.date = today.toISOString().substr(0,10)
+        this.today = new Date();
+        var dd = this.today.getDate();
+        var mm = this.today.getMonth()+1; //January is 0!
+        var yyyy = this.today.getFullYear();
+
+        if(dd<10) {
+            dd = '0'+dd
+        } 
+
+        if(mm<10) {
+            mm = '0'+mm
+        } 
+
+        this.today = yyyy + '-' + mm + '-' + dd
     }
 }
 </script>

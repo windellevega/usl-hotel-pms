@@ -5,10 +5,20 @@
             <v-card>
                 <v-form v-model="valid">
                     <v-card-title>
-                        <span class="headline">{{ formTitle }}</span>
+                        <span class="headline" py-0>{{ formTitle }}</span>
                     </v-card-title>
                     <v-card-text>
                         <v-container grid-list-md>
+                            <v-layout v-if="formvalidation" wrap>
+                                <v-flex py-0 fill-height xs12 sm6 md6 v-for="(error,i) in validationerrors" :key="i">
+                                    <p py-0
+                                        style="color:#FF1744"
+                                        class="caption font-weight 400" 
+                                        >
+                                        *{{ error }}
+                                    </p>
+                                </v-flex>
+                            </v-layout>
                             <v-layout wrap>
                                 <v-flex xs12 sm12 md12>
                                     <v-select
@@ -204,6 +214,7 @@
             <td class="text-xs-left">{{ props.item.checkin }}</td>
             <td class="text-xs-left">{{ props.item.checkout }}</td>
             <td class="text-xs-left">₱ {{ props.item.bookingcharge }}</td>
+            <td class="text-xs-left">{{ props.item.stayduration_days }}</td>
             <td class="justify-center layout px-0">
             <v-btn icon class="mx-0" @click="editItem(props.item)">
                 <v-icon color="teal">edit</v-icon>
@@ -228,11 +239,13 @@
     axios.defaults.headers.common['Accept'] = 'application/json';
   export default {
     data: () => ({
+        formvalidation: false,
+        validationerrors: '',
         valid: false,
         dialog: false,
         headers: [
             {
-                text: 'Room Name', value: 'room_name'
+                text: 'Room Name', value: 'room.room_name'
             },
             { text: 'Guest Name', value: 'guest.fullname' },
             { text: 'Booking Type', value: 'booking_type' },
@@ -240,6 +253,7 @@
             { text: 'Check-In', value: 'checkin' },
             { text: 'Check-Out', value: 'checkout' },
             { text: 'Booking Charge', value: 'bookingcharge' },
+            { text: 'Duration', value: 'stayduration_days' },
             { text: 'Actions', value: 'name', sortable: false }
         ],
         reservations: [],
@@ -259,22 +273,22 @@
     }),
 
     computed: {
-      formTitle () {
-        return this.editedIndex === -1 ? 'New Reservation' : 'Edit Reservation'
-      }
+        formTitle () {
+            return this.editedIndex === -1 ? 'New Reservation' : 'Edit Reservation'
+        }
     },
 
     watch: {
-      dialog (val) {
-        val || this.close()
-      }
+        dialog (val) {
+            val || this.close()
+        }
     },
 
     created () {
-      this.getReservations()
-      this.getGuestInfo()
-      this.getRoomInfo()
-      this.getBookingTypes()
+        this.getReservations()
+        this.getGuestInfo()
+        this.getRoomInfo()
+        this.getBookingTypes()
     },
 
     methods: {
@@ -311,9 +325,6 @@
             //for select menu
             axios.get('api/rooms').then(response => {
                 var item = []
-                /*response.data.forEach(function(e) {
-                    item.push({text: e.room_name, value: e.id})
-                })*/
                 this.rooms = response.data
             })
             .catch(error => {
@@ -330,42 +341,71 @@
                 console.log(error.message)
             })
         },
-        editItem (item) {
+        editItem(item) { //promp form dialog to edit item
             this.editedIndex = this.reservations.indexOf(item)
             this.editedItem = Object.assign({}, item)
             this.dialog = true
         },
         deleteItem (item) {
             const index = this.reservations.indexOf(item)
-            confirm('Are you sure you want to delete this item?') && this.reservations.splice(index, 1)
+            if(confirm('Are you sure you want to delete this item?')) {
+                this.reservations.splice(index, 1)
+                axios.delete('api/booking/' + item.id)
+                .then(response => {
+                    alert(response.data.message)
+                })
+            }
+            
         },
-
         close () {
             this.dialog = false
+            this.formvalidation = false
             setTimeout(() => {
             this.editedItem = Object.assign({}, this.defaultItem)
             this.editedIndex = -1
             }, 300)
         },
-
         saveReservation () {
-            if(this.editedItem.id == undefined) {
+            if(this.editedItem.id == undefined) { //If new reservation
                 axios.post('api/reservation', this.editedItem)
                 .then(response => {
-                    console.log(response.data)
-                    this.getReservations();
+                    //Check for validation errors
+                    if(response.data.message) {
+                        this.close()
+                        this.getReservations()
+                        alert(response.data.message)
+                    }
+                    else {
+                        this.formvalidation = true
+                        this.validationerrors = response.data
+                    }
                 })
                 .catch(error => {
-                    console.log(error.message)
-                })
-                this.close()
+                    alert(error.message)
+                })      
             }
-            else {
-                //edit data
+            else { //If rervation detail will be updated
+                axios.patch('api/reservation/' + this.editedItem.id, this.editedItem)
+                .then(response => {
+                    if(response.data.message) {
+                        this.close()
+                        this.getReservations()
+                        alert(response.data.message)
+                    }
+                    else {
+                        this.formvalidation = true
+                        this.validationerrors = response.data
+                    }
+                })
+                .catch(error => {
+                    alert(error.message)
+                })
             }
             
         },
         setDatePickerMinDate() {
+            //Set minimum date for reservation
+            //cannot reserve current date
             var today = new Date()
             var cmindate = new Date(today.getTime() + (24 * 60 * 60 * 1000));
             this.cmindate = cmindate.toISOString().substr(0,10)

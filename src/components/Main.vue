@@ -58,7 +58,6 @@
 
 <script>
     import AppNavList from './layouts/Home/AppNavList.vue';
-
     export default {
         data() {
             return {
