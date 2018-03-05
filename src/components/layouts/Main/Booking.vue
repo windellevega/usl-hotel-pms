@@ -186,7 +186,7 @@ export default {
         }
         
     },
-    created() {
+    mounted() {
         axios.get('/api/rooms')
             .then(response => {
                 response.data.forEach(function(element, i) {

@@ -28,19 +28,11 @@
                 </v-btn>
                 <span class="hidden-xs-only"><strong>Tjolle Hotel</strong> PMS</span>
             </v-toolbar-title>
-            
-            <div class="d-flex align-center" style="margin-left: auto">             
-                <v-btn icon>
-                    <v-icon>forward</v-icon>
-                </v-btn>
-            </div>
         </v-toolbar>
 
         <v-content>
             <v-container fluid>
-
                 <router-view></router-view>
-                
             </v-container>
 
         </v-content>
