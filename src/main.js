@@ -5,6 +5,7 @@ import App from './App.vue'
 import router from './router'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
+import 'font-awesome/css/font-awesome.css';
 
 
 

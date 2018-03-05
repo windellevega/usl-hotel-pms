@@ -29,12 +29,9 @@
                 <span class="hidden-xs-only"><strong>Tjolle Hotel</strong> PMS</span>
             </v-toolbar-title>
             
-            <div class="d-flex align-center" style="margin-left: auto">
+            <div class="d-flex align-center" style="margin-left: auto">             
                 <v-btn icon>
-                    <v-icon>apps</v-icon>
-                </v-btn>
-                <v-btn icon>
-                    <v-icon>notifications</v-icon>
+                    <v-icon>forward</v-icon>
                 </v-btn>
             </div>
         </v-toolbar>
@@ -58,6 +55,15 @@
 
 <script>
     import AppNavList from './layouts/Home/AppNavList.vue';
+    import axios from 'axios'
+    import auth from './auth'
+
+    //Initialize global headers for axios
+    axios.defaults.baseURL = 'http://localhost:8000'
+    axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
+    axios.defaults.headers.common['Accept'] = 'application/json'
+    axios.defaults.headers.common['Authorization'] = auth.getAuthHeader().Authorization
+
     export default {
         data() {
             return {
@@ -66,6 +72,14 @@
         },
         components: {
             AppNavList
+        },
+        mounted() {
+
+            //Check if user is authenticated
+            auth.checkAuth()
+            if(!auth.user.authenticated) {
+                this.$router.replace('/login')
+            }
         }
     }
 </script>

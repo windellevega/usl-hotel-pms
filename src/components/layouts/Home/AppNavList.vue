@@ -76,16 +76,17 @@ export default {
                 { icon: 'book', text: 'Booking', route: '/booking', active: false },
                 { icon: 'date_range', text: 'Reservation', route: '/reservation', active: false },
                 {
-                icon: 'keyboard_arrow_up',
-                'icon-alt': 'keyboard_arrow_down',
-                text: 'Information Manager',
-                model: true,
-                children: [
-                    { icon: 'people', text: 'Customers', route: '/customers', active: false },
-                    { icon: 'style', text: 'Rooms', route: '/rooms', active: false },
-                    { icon: 'lock', text: 'Accounts', route: '/accounts', active: false }
-                ]
-                }
+                    icon: 'keyboard_arrow_up',
+                    'icon-alt': 'keyboard_arrow_down',
+                    text: 'Information Manager',
+                    model: true,
+                    children: [
+                        { icon: 'people', text: 'Customers', route: '/customers', active: false },
+                        { icon: 'style', text: 'Rooms', route: '/rooms', active: false },
+                        { icon: 'lock', text: 'Accounts', route: '/accounts', active: false }
+                    ]
+                },
+                { icon: 'fa-sign-out', text: 'Sign Out', route: '/login', active: false }
             ]
         }
     },

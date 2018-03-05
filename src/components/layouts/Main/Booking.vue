@@ -82,10 +82,7 @@
 import RoomReservationsList from './../Booking/RoomReservationsList.vue'
 import RoomStatusList from './../Booking/RoomStatusList.vue'
 import axios from 'axios'
-
-axios.defaults.baseURL = 'http://localhost:8000';
-axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
-axios.defaults.headers.common['Accept'] = 'application/json';
+import auth from './../../auth'
 
 export default {
     name: 'booking',
