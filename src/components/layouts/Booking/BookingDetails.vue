@@ -41,8 +41,8 @@
                             >
                                 <template slot="items" slot-scope="props">
                                     <td class="text-xs-left"> {{ props.item.othercharge_info }} </td>
-                                    <td class="text-xs-left">₱{{ props.item.cost }}</td>
-                                    <td class="text-xs-left">{{ props.item.quantity }}</td>
+                                    <td class="text-xs-right">₱{{ props.item.cost }}</td>
+                                    <td class="text-xs-center">{{ props.item.quantity }}</td>
                                     <td class="text-xs-right pa-0">₱{{ props.item.totalcost }}</td>
                                     <td class="text-xs-center pa-0">
                                         <v-btn icon class="mx-0" small @click="">
@@ -196,7 +196,15 @@ export default {
             this.$emit('closedialog', false)
         },
         addOtherCharge() {
-            console.log(this.addcharge)
+            axios.post('/api/othercharge', this.addcharge)
+            .then(response => {
+                this.addcharge.cost = parseFloat(this.addcharge.cost).to
+                this.addcharge.totalcost = parseFloat(parseFloat(this.addcharge.cost) * parseFloat(this.addcharge.quantity)).toFixed(2)
+                this.roomdetails.billing.other_charge.push(this.addcharge)
+            })
+            .catch(error => {
+                console.log(error)
+            })
         }
     },
     watch: {
