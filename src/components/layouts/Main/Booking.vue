@@ -9,7 +9,23 @@
         <v-layout row wrap>
             <v-flex xs4 sm4 v-for="(room, i) in rooms" :key="i">
                 <v-card class="elevation-3" fluid>
-                    <v-card-title primary-title 
+                    <v-card-title 
+                        v-if="room.status_history[0].status_id === 4 
+                                || room.status_history[0].status_id === 5 
+                                || room.status_history[0].status_id === 8"
+                        primary-title 
+                        :class="getStatusColor(room.status_history[0].status_id)"
+                        @click="showDialog(room.id)"
+                    >
+                        <div style="min-height:110px">
+                            <h3 class="headline mb-0">{{ room.room_name }}</h3>
+                            <strong>Features: </strong><span>{{ room.room_description }}</span><br>
+                            <strong>Capacity: </strong><span>{{ room.capacity }}</span><br>
+                        </div>
+                    </v-card-title>
+                    <v-card-title 
+                        v-else
+                        primary-title 
                         :class="getStatusColor(room.status_history[0].status_id)"
                     >
                         <div style="min-height:110px">
@@ -24,6 +40,7 @@
                                     || room.status_history[0].status_id === 5 
                                     || room.status_history[0].status_id === 8" 
                             flat color="orange darken-4"
+                            @click="showDialog(room.id)"
                         >
                             Checkout
                         </v-btn>
@@ -57,10 +74,9 @@
                         :roomid="room.id"
                     >
                     </room-reservations-list>   
-
                 </v-card>
             </v-flex>
-            <v-btn
+            <!--<v-btn
                 fab
                 bottom
                 right
@@ -73,7 +89,12 @@
             </v-btn>
             <v-dialog v-model="dialog" width="800px">
                 
-            </v-dialog>
+            </v-dialog>-->
+            <booking-details 
+                @closedialog="showdetails = $event"
+                :roomid="roomid"
+                :show="showdetails"
+            ></booking-details>
         </v-layout>
     </v-container>
 </template>
@@ -81,22 +102,29 @@
 <script>
 import RoomReservationsList from './../Booking/RoomReservationsList.vue'
 import RoomStatusList from './../Booking/RoomStatusList.vue'
+import BookingDetails from './../Booking/BookingDetails.vue'
 import axios from 'axios'
 import auth from './../../auth'
 
 export default {
     name: 'booking',
     components: { 
-        RoomReservationsList, RoomStatusList
+        RoomReservationsList, RoomStatusList, BookingDetails
     },
     data() {
         return {
             dialog: false,
             rooms: null,
-            status: ''
+            status: '',
+            showdetails: false,
+            roomid: null
         }
     },
     methods: {
+        showDialog(roomid) {
+            this.roomid = roomid
+            this.showdetails = true
+        },
         getStatusColor(status) {
             let status_color = ''
             if(status === 1) {
@@ -188,15 +216,15 @@ export default {
     },
     mounted() {
         axios.get('/api/rooms')
-            .then(response => {
-                response.data.forEach(function(element, i) {
-                    element.show = false
-                })
-                this.rooms = response.data
+        .then(response => {
+            response.data.forEach(function(element, i) {
+                element.show = false
             })
-            .catch(error => {
-                console.log(error.message)
-            })
+            this.rooms = response.data
+        })
+        .catch(error => {
+            console.log(error.message)
+        })
     }
 }
 </script>

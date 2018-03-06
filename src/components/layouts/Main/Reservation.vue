@@ -206,27 +206,27 @@
         hide-actions
         class="elevation-1"
         >
-        <template slot="items" slot-scope="props">
-            <td class="text-xs-center">{{ props.item.room.room_name }}</td>
-            <td class="text-xs-left">{{ props.item.guest.fullname }} ({{ props.item.guest.guest_type.guesttype }}) - {{ props.item.guest.company.companyname }}</td>
-            <td class="text-xs-left">{{ props.item.booking_type.bookingtype }}</td>
-            <td class="text-xs-left">{{ props.item.numberofpax }}</td>
-            <td class="text-xs-left">{{ props.item.checkin }}</td>
-            <td class="text-xs-left">{{ props.item.checkout }}</td>
-            <td class="text-xs-left">₱ {{ props.item.bookingcharge }}</td>
-            <td class="text-xs-left">{{ props.item.stayduration_days }}</td>
-            <td class="justify-center layout px-0">
-            <v-btn icon class="mx-0" @click="editItem(props.item)">
-                <v-icon color="teal">edit</v-icon>
-            </v-btn>
-            <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                <v-icon color="red accent-3">delete</v-icon>
-            </v-btn>
-            </td>
-        </template>
-        <template slot="no-data">
-            <td colspan="7" class="text-xs-center">There are no reservations to show.</td>
-        </template>
+            <template slot="items" slot-scope="props">
+                <td class="text-xs-center">{{ props.item.room.room_name }}</td>
+                <td class="text-xs-left">{{ props.item.guest.fullname }} ({{ props.item.guest.guest_type.guesttype }}) - {{ props.item.guest.company.companyname }}</td>
+                <td class="text-xs-left">{{ props.item.booking_type.bookingtype }}</td>
+                <td class="text-xs-left">{{ props.item.numberofpax }}</td>
+                <td class="text-xs-left">{{ props.item.checkin }}</td>
+                <td class="text-xs-left">{{ props.item.checkout }}</td>
+                <td class="text-xs-left">₱ {{ props.item.bookingcharge }}</td>
+                <td class="text-xs-left">{{ props.item.stayduration_days }}</td>
+                <td class="justify-center layout px-0">
+                <v-btn icon class="mx-0" @click="editItem(props.item)">
+                    <v-icon color="teal">edit</v-icon>
+                </v-btn>
+                <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+                    <v-icon color="red accent-3">delete</v-icon>
+                </v-btn>
+                </td>
+            </template>
+            <template slot="no-data">
+                <td colspan="7" class="text-xs-center">There are no reservations to show.</td>
+            </template>
         </v-data-table>
     </div>
 </template>

@@ -70,6 +70,8 @@
             //Check if user is authenticated
             auth.checkAuth()
             if(!auth.user.authenticated) {
+                
+                alert('You are not logged in! Please login to continue.')
                 this.$router.replace('/login')
             }
         }
