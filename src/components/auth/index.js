@@ -18,6 +18,7 @@ export default {
             localStorage.setItem('access_token', response.data.access_token)
             localStorage.setItem('refresh_token', response.data.refresh_token)
             this.user.authenticated = true
+            this.getAuthHeader()
             router.push('/booking')
         })
         .catch(error => {

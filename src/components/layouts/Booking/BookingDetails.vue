@@ -9,7 +9,7 @@
                             <strong>ROOM: </strong>{{ roomdetails.room.room_name }}
                         </v-flex>
                         <v-flex xs12 sm12 py-1>  
-                            <strong>GUEST: </strong>{{ roomdetails.guest.fullname }} - {{ roomdetails.guest.company.companyname }}
+                            <strong>GUEST: </strong>{{ roomdetails.guest.fullname }} ({{ roomdetails.guest.guest_type.guesttype }}) - {{ roomdetails.guest.company.companyname }}
                         </v-flex>
                         <v-flex xs12 sm6 md6 py-1>  
                             <strong>CHECK-IN: </strong>{{ roomdetails.checkin }}
@@ -76,17 +76,17 @@
                                     <td></td>
                                 </template>
                                 <template slot="no-data">
-                                    <td colspan="4" class="text-xs-center">There are no reservations to show.</td>
+                                    <td colspan="5" class="text-xs-center">There are no other charges.</td>
                                 </template>
                             </v-data-table>
                         </v-flex>
                         <v-flex xs12 sm12 md12 py-1>
                             <v-expansion-panel popout>
-                                <v-expansion-panel-content>
+                                <v-expansion-panel-content hide-actions>
                                     <div slot="header" class=".body-1"><v-icon color="green darken-1">add_box</v-icon> <strong>Add Other Charge</strong></div>
                                     <v-card>
                                         <v-card-text>
-                                            <v-form>
+                                            <v-form ref="addchargeform">
                                                 <v-layout row>
                                                     <v-flex xs12 sm4 md4 px-2>
                                                         <v-text-field 
@@ -158,8 +158,8 @@ export default {
                 checkout: '',
                 numberofpax: '',
                 remarks: '',
-                totalothercharge: 0,
-                bookingcharge: 0,
+                totalothercharge: 0.00,
+                bookingcharge: 0.00,
                 room: {
                     room_name: ''
                 },
@@ -180,13 +180,13 @@ export default {
                         {
                             othercharge_info: '',
                             quantity: '',
-                            cost: 0,
-                            totalcost: 0
+                            cost: 0.00,
+                            totalcost: 0.00
                         }
                     ],
-                    downpayment: 0,
-                    totalcharges: 0,
-                    amountdue: 0
+                    downpayment: 0.00,
+                    totalcharges: 0.00,
+                    amountdue: 0.00
                 }
             }
         }
@@ -198,9 +198,14 @@ export default {
         addOtherCharge() {
             axios.post('/api/othercharge', this.addcharge)
             .then(response => {
-                this.addcharge.cost = parseFloat(this.addcharge.cost).to
-                this.addcharge.totalcost = parseFloat(parseFloat(this.addcharge.cost) * parseFloat(this.addcharge.quantity)).toFixed(2)
-                this.roomdetails.billing.other_charge.push(this.addcharge)
+                axios.get('/api/othercharges/' + this.roomdetails.billing.id).
+                then(response => {
+                    this.roomdetails.billing.other_charge = response.data
+                    this.$refs.addchargeform.reset()
+                })
+                .catch(error => {
+                    console.log(error)
+                })
             })
             .catch(error => {
                 console.log(error)

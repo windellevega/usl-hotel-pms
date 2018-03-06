@@ -70,7 +70,7 @@
             credentials: {
                 grant_type: 'password',
                 client_id: 2,
-                client_secret: 'GUsJwLTHKUykc6M4J5eK2X2VjhrGckCCaBbko2d9',
+                client_secret: 'sfaSx9e0D4UKrSZS2Nlykut8bU5TOEgCPCVAVo9q',
                 username: '',
                 password: '',
                 scope: '*'
