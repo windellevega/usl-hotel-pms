@@ -3,7 +3,7 @@
         <v-dialog persistent v-model="dialog" max-width="700px">
             <v-btn color="primary" dark slot="activator" class="mb-2">New Reservation</v-btn>
             <v-card>
-                <v-form v-model="valid">
+                <v-form>
                     <v-card-title>
                         <span class="headline" py-0>{{ formTitle }}</span>
                     </v-card-title>
@@ -102,6 +102,7 @@
                                             v-model="editedItem.checkoutdate"
                                             prepend-icon="event"
                                             readonly
+                                            required
                                         ></v-text-field>
                                         <v-date-picker 
                                             v-model="editedItem.checkoutdate" 
@@ -128,6 +129,7 @@
                                             v-model="editedItem.checkouttime"
                                             prepend-icon="access_time"
                                             readonly
+                                            required
                                         ></v-text-field>
                                         <v-time-picker 
                                             v-model="editedItem.checkouttime" 
@@ -239,7 +241,6 @@
     data: () => ({
         formvalidation: false,
         validationerrors: '',
-        valid: false,
         dialog: false,
         headers: [
             {
@@ -258,10 +259,10 @@
         editedIndex: -1,
 
         editedItem: {
-            billing: { downpayment: null} 
+            billing: { downpayment: 0.00} 
         },
         defaultItem: {
-            billing: { downpayment: null} 
+            billing: { downpayment: 0.00} 
         },
         guests: [],
         rooms: [],
@@ -290,9 +291,6 @@
     },
 
     methods: {
-        testing(val) {
-            alert(val)
-        },
         getReservations() {
             //get all reservation information
             axios.get('/api/reservations').then(response => {

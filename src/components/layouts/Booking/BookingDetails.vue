@@ -55,8 +55,10 @@
                                         <span class="caption">
                                             Total:<br>
                                             Booking Charge:<br>
+                                            -----------------<br>
                                             Total Charge:<br>
                                             <span style="color:#E5143D">Downpayment:</span><br>
+                                            -----------------<br>
                                         </span>
                                         <strong>
                                             Amount Due:<br>
@@ -66,8 +68,10 @@
                                         <span class="caption">
                                             ₱{{ totalOtherCharge }}<br>
                                             ₱{{ roomdetails.bookingcharge }}<br>
+                                            ---------------<br>
                                             ₱{{ totalCharges }}<br>
                                             <span style="color:#E5143D">₱{{ roomdetails.billing.downpayment }}</span><br>
+                                            -----------------<br>
                                         </span>
                                         <strong>
                                             ₱{{ amountDue }}

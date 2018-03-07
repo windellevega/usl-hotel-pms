@@ -15,7 +15,7 @@
                                 || room.status_history[0].status_id === 8"
                         primary-title 
                         :class="getStatusColor(room.status_history[0].status_id)"
-                        @click="showDialog(room.id)"
+                        @click="showRoomDetailsDialog(room.id)"
                     >
                         <div style="min-height:110px">
                             <h3 class="headline mb-0">{{ room.room_name }}</h3>
@@ -40,11 +40,14 @@
                                     || room.status_history[0].status_id === 5 
                                     || room.status_history[0].status_id === 8" 
                             flat color="orange darken-4"
-                            @click="showDialog(room.id)"
-                        >
-                            Checkout
-                        </v-btn>
-                        <v-btn v-else flat color="blue darken-3">New Booking</v-btn>
+                            @click="showRoomDetailsDialog(room.id)"
+                        >Checkout</v-btn>
+                        <v-btn 
+                            v-else 
+                            flat 
+                            color="blue darken-3"  
+                            @click="showBookingFormDialog(room.id)"
+                        >New Booking</v-btn>
                         <v-spacer></v-spacer>
                         <v-menu offset-y full-width>
                             <v-chip slot="activator">
@@ -92,9 +95,14 @@
             </v-dialog>-->
             <booking-details 
                 @closedialog="showdetails = $event"
-                :roomid="roomid"
+                :roomid="roomiddetails"
                 :show="showdetails"
             ></booking-details>
+            <booking-form 
+                @closedialog="showbookingform = $event"
+                :roomid="roomidbooking"
+                :show="showbookingform"
+            ></booking-form>
         </v-layout>
     </v-container>
 </template>
@@ -103,13 +111,17 @@
 import RoomReservationsList from './../Booking/RoomReservationsList.vue'
 import RoomStatusList from './../Booking/RoomStatusList.vue'
 import BookingDetails from './../Booking/BookingDetails.vue'
+import BookingForm from './../Booking/BookingForm.vue'
 import axios from 'axios'
 import auth from './../../auth'
 
 export default {
     name: 'booking',
     components: { 
-        RoomReservationsList, RoomStatusList, BookingDetails
+        RoomReservationsList, 
+        RoomStatusList, 
+        BookingDetails,
+        BookingForm
     },
     data() {
         return {
@@ -117,13 +129,19 @@ export default {
             rooms: null,
             status: '',
             showdetails: false,
-            roomid: null
+            showbookingform: false,
+            roomiddetails: null,
+            roomidbooking: null
         }
     },
     methods: {
-        showDialog(roomid) {
-            this.roomid = roomid
+        showRoomDetailsDialog(roomid) {
+            this.roomiddetails = roomid
             this.showdetails = true
+        },
+        showBookingFormDialog(roomid) {
+            this.roomidbooking = roomid
+            this.showbookingform = true
         },
         getStatusColor(status) {
             let status_color = ''
@@ -211,20 +229,25 @@ export default {
             }
 
             return status_name;
+        },
+        loadRooms() {
+            axios.get('/api/rooms')
+            .then(response => {
+                response.data.forEach(function(element, i) {
+                    element.show = false
+                })
+                this.rooms = response.data
+            })
+            .catch(error => {
+                console.log(error.message)
+            })
+        },
+        try() {
+            alert('it works!')
         }
-        
     },
     mounted() {
-        axios.get('/api/rooms')
-        .then(response => {
-            response.data.forEach(function(element, i) {
-                element.show = false
-            })
-            this.rooms = response.data
-        })
-        .catch(error => {
-            console.log(error.message)
-        })
+        this.loadRooms()
     }
 }
 </script>

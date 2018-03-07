@@ -3,7 +3,7 @@
         <v-content>
             <v-container fluid fill-height>
                 <v-layout align-center justify-center>
-                    <v-flex xs12 sm6 md3>
+                    <v-flex xs12 sm6 md4>
                             <v-card class="elevation-12">
                                 <v-toolbar dark color="blue darken-3">
                                     <v-toolbar-title>Login</v-toolbar-title>
