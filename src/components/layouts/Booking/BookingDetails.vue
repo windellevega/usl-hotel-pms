@@ -45,7 +45,7 @@
                                     <td class="text-xs-center">{{ props.item.quantity }}</td>
                                     <td class="text-xs-right pa-0">₱{{ props.item.totalcost }}</td>
                                     <td class="text-xs-center pa-0">
-                                        <v-btn icon class="mx-0" small @click="">
+                                        <v-btn icon class="mx-0" small @click="removeOtherCharge(props.item.id)">
                                             <v-icon color="red accent-3">fa-times</v-icon>
                                         </v-btn>
                                     </td>
@@ -64,13 +64,13 @@
                                     </td>
                                     <td class="text-xs-right pa-0">
                                         <span class="caption">
-                                            ₱{{ roomdetails.totalothercharge }}<br>
+                                            ₱{{ totalOtherCharge }}<br>
                                             ₱{{ roomdetails.bookingcharge }}<br>
-                                            ₱{{ roomdetails.billing.totalcharges }}<br>
+                                            ₱{{ totalCharges }}<br>
                                             <span style="color:#E5143D">₱{{ roomdetails.billing.downpayment }}</span><br>
                                         </span>
                                         <strong>
-                                            ₱{{ roomdetails.billing.amountdue }}
+                                            ₱{{ amountDue }}
                                         </strong>
                                     </td>
                                     <td></td>
@@ -158,7 +158,6 @@ export default {
                 checkout: '',
                 numberofpax: '',
                 remarks: '',
-                totalothercharge: 0.00,
                 bookingcharge: 0.00,
                 room: {
                     room_name: ''
@@ -178,15 +177,14 @@ export default {
                 billing: {
                     other_charge: [
                         {
+                            id: 0,
                             othercharge_info: '',
                             quantity: '',
                             cost: 0.00,
                             totalcost: 0.00
                         }
                     ],
-                    downpayment: 0.00,
-                    totalcharges: 0.00,
-                    amountdue: 0.00
+                    downpayment: 0.00
                 }
             }
         }
@@ -210,6 +208,43 @@ export default {
             .catch(error => {
                 console.log(error)
             })
+        },
+        removeOtherCharge(id) {
+            if(confirm('Do you want to remove this item?')) {
+                axios.delete('/api/othercharge/' + id)
+                .then(response => {
+                    axios.get('/api/othercharges/' + this.roomdetails.billing.id).
+                    then(response => {
+                        this.roomdetails.billing.other_charge = response.data
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
+                    console.log(response.data.message)
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+            }
+        }
+    },
+    computed: {
+        totalOtherCharge: function() {
+            var totOCharge = 0.00
+            this.roomdetails.billing.other_charge.forEach(function(e){
+                totOCharge = parseFloat(totOCharge) + parseFloat(e.totalcost)
+            })
+            return parseFloat(totOCharge).toFixed(2)
+        },
+        totalCharges: function() {
+            var totCharge = 0.00
+            totCharge = parseFloat(this.totalOtherCharge) + parseFloat(this.roomdetails.bookingcharge)
+            return parseFloat(totCharge).toFixed(2)
+        },
+        amountDue: function() {
+            var amtDue = 0.00
+            amtDue = parseFloat(this.totalCharges) - parseFloat(this.roomdetails.billing.downpayment)
+            return parseFloat(amtDue).toFixed(2)
         }
     },
     watch: {
@@ -218,12 +253,6 @@ export default {
             .then(response => {
                 console.log(response.data)
                 this.roomdetails = response.data
-                var totalothercharge = 0
-                response.data.billing.other_charge.forEach(function(e) {
-                    totalothercharge = parseFloat(totalothercharge) + parseFloat(e.totalcost)
-                })
-                this.roomdetails.totalothercharge = parseFloat(totalothercharge).toFixed(2)
-                this.roomdetails.billing.amountdue = parseFloat(this.roomdetails.billing.totalcharges - this.roomdetails.billing.downpayment).toFixed(2)
                 this.addcharge.billingid = this.roomdetails.billing.id
             })
             .catch(error => {

@@ -350,7 +350,7 @@
                 this.reservations.splice(index, 1)
                 axios.delete('api/booking/' + item.id)
                 .then(response => {
-                    alert(response.data.message)
+                    console.log(response.data.message)
                 })
             }
             

@@ -67,8 +67,15 @@ export default {
                     remarks: null
                 })
                 .then(response => {
-                    console.log(response.data.message)
-                    this.$emit('changestatus', statid)
+                    if(response.data == 0) {
+                        alert('Cannot change status. There is no reservation or booking for this day.')
+                    }
+                    else if(response.data == 1) {
+                        alert('Cannot change status. The room is currently occupied.')
+                    }
+                    else {
+                        this.$emit('changestatus', statid)
+                    }
                 })
                 .catch(error => {
                     console.log(error.message)
