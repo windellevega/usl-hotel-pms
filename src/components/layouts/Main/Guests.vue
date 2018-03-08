@@ -1,13 +1,23 @@
 <template>
     <div>
         <v-dialog v-model="dialog" max-width="600px">
-            <v-btn color="primary" dark slot="activator" class="mb-2">New Customer</v-btn>
+            <v-btn color="primary" dark slot="activator" class="mb-2">New Guest</v-btn>
             <v-card>
                 <v-card-title>
                     <span class="headline">{{ formTitle }}</span>
                 </v-card-title>
                 <v-card-text>
                     <v-container grid-list-md>
+                        <v-layout v-if="formvalidation" wrap>
+                            <v-flex py-0 fill-height xs12 sm6 md6 v-for="(error,i) in validationerrors" :key="i">
+                                <p py-0
+                                    style="color:#FF1744"
+                                    class="caption font-weight 400" 
+                                    >
+                                    *{{ error }}
+                                </p>
+                            </v-flex>
+                        </v-layout>
                         <v-layout wrap>
                             <v-flex xs12 sm6 md6>
                                 <v-text-field 
@@ -51,15 +61,6 @@
                                     bottom
                                     v-model="editedItem.company_id"
                                 ></v-select>
-                            </v-flex>
-                            <v-flex xs12 sm6 md4>
-                                <v-text-field label="Fat (g)" v-model="editedItem.fat"></v-text-field>
-                            </v-flex>
-                            <v-flex xs12 sm6 md4>
-                                <v-text-field label="Carbs (g)" v-model="editedItem.carbs"></v-text-field>
-                            </v-flex>
-                            <v-flex xs12 sm6 md4>
-                                <v-text-field label="Protein (g)" v-model="editedItem.protein"></v-text-field>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -106,6 +107,8 @@ import auth from './../../auth'
 
 export default {
     data: () => ({
+        formvalidation: false,
+        validationerrors: '',
         dialog: false,
         headers: [
             { text: 'Guest Name', value: 'fullname' },
@@ -128,7 +131,7 @@ export default {
     },
     computed: {
         formTitle () {
-        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+        return this.editedIndex === -1 ? 'New Guest' : 'Edit Guest'
         }
     },
 
@@ -139,13 +142,13 @@ export default {
     },
 
     created () {
-        this.getCustomers()
+        this.getGuests()
         this.getGuestTypes()
         this.getCompanies()
     },
 
     methods: {
-        getCustomers() {
+        getGuests() {
             axios.get('/api/guests')
             .then(response => {
                 if(response.data.message == undefined) {
@@ -198,12 +201,31 @@ export default {
         },
 
         save () {
-            if (this.editedIndex > -1) {
+            console.log(this.editedItem)
+            if(this.editedItem.id == undefined) {
+                axios.post('/api/guest', this.editedItem)
+                .then(response => {
+                    //Check for validation errors
+                    if(response.data.message) {
+                        this.close()
+                        this.getGuests()
+                        alert(response.data.message)
+                    }
+                    else {
+                        this.formvalidation = true
+                        this.validationerrors = response.data
+                    }
+                })
+            }
+            else {
+
+            }
+            /*if (this.editedIndex > -1) {
                 Object.assign(this.guests[this.editedIndex], this.editedItem)
             } else {
                 this.guests.push(this.editedItem)
             }
-            this.close()
+            this.close()*/
         }
     }
 }
