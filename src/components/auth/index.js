@@ -15,11 +15,8 @@ export default {
     login(context, credentials) {
         axios.post(LOGIN_URL, credentials)
         .then(response => {
-            localStorage.setItem('access_token', response.data.access_token)
-            localStorage.setItem('refresh_token', response.data.refresh_token)
+            this.setSession(response.data)
             this.user.authenticated = true
-            this.getAuthHeader()
-            router.push('/booking')
         })
         .catch(error => {
             context.alert = true
@@ -27,23 +24,36 @@ export default {
             context.active = false
         })
     },
+    setSession(authResult) {
+        localStorage.setItem('access_token', authResult.access_token)
+        localStorage.setItem('refresh_token', authResult.refresh_token)
+        
+        //calculate time where access token will expire
+        let currTime = new Date()
+        currTime = currTime.getTime()
+        let expiresAt = JSON.stringify(
+            authResult.expires_in * 1000 + currTime
+        )
+        localStorage.setItem('expires_at', expiresAt)
+
+        router.push('/booking')
+    },
     logout() {
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
         this.user.authenticated = false
     },
     checkAuth() {
-        var token = localStorage.getItem('access_token')
-        if(token) {
-          this.user.authenticated = true
+        let currTime = new Date()
+        currTime = currTime.getTime()
+
+        if(currTime < localStorage.getItem('expires_at')) {
+            this.user.authenticated = true
         }
         else {
-          this.user.authenticated = false      
-        }
-    },
-    getAuthHeader() {
-        return {
-          'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+            this.user.authenticated = false 
+            alert('You are not logged in! Please login to continue.')
+            router.push('/login')     
         }
     }
 }

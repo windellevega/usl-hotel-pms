@@ -234,10 +234,10 @@
 </template>
 
 <script>
-    import axios from 'axios'
-    import auth from './../../auth'
+import axios from 'axios'
+import auth from './../../auth'
 
-  export default {
+export default {
     data: () => ({
         formvalidation: false,
         validationerrors: '',
@@ -270,7 +270,9 @@
         cmindate: '',
         dmindate: ''
     }),
-
+    beforeCreate() {
+        auth.checkAuth()
+    },
     computed: {
         formTitle () {
             return this.editedIndex === -1 ? 'New Reservation' : 'Edit Reservation'
@@ -293,7 +295,8 @@
     methods: {
         getReservations() {
             //get all reservation information
-            axios.get('/api/reservations').then(response => {
+            axios.get('/api/reservations')
+            .then(response => {
                 if(response.data.message == undefined) {
                     this.reservations = response.data
                 }
@@ -305,7 +308,8 @@
         getGuestInfo() {
             //get all guest information
             //for select menu
-            axios.get('/api/guests').then(response => {
+            axios.get('/api/guests')
+            .then(response => {
                 var item = []
                 response.data.forEach(function(e) {
                     item.push({text: e.fullname + ' (' + e.guest_type.guesttype + ') - ' + e.company.companyname, value: e.id})
@@ -319,7 +323,8 @@
         getRoomInfo() {
             //get all room information
             //for select menu
-            axios.get('api/rooms').then(response => {
+            axios.get('api/rooms')
+            .then(response => {
                 var item = []
                 this.rooms = response.data
             })
@@ -330,7 +335,8 @@
         getBookingTypes() {
             //get all booking type information
             //for select menu
-            axios.get('api/bookingtypes').then(response => {
+            axios.get('api/bookingtypes')
+            .then(response => {
                 this.bookingtypes = response.data
             })
             .catch(error => {
@@ -407,5 +413,5 @@
             this.cmindate = cmindate.toISOString().substr(0,10)
         }
     }
-  }
+}
 </script>

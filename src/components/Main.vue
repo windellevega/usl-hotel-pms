@@ -46,7 +46,7 @@
 </template>
 
 <script>
-    import AppNavList from './layouts/Home/AppNavList.vue';
+    import AppNavList from './layouts/Home/AppNavList.vue'
     import axios from 'axios'
     import auth from './auth'
 
@@ -54,25 +54,17 @@
     axios.defaults.baseURL = 'http://localhost:8000'
     axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
     axios.defaults.headers.common['Accept'] = 'application/json'
-    axios.defaults.headers.common['Authorization'] = auth.getAuthHeader().Authorization
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
 
     export default {
-        data() {
-            return {
-                drawer: null
-            }
-        },
+        data: () => ({
+            drawer: null
+        }),
         components: {
             AppNavList
         },
-        mounted() {
-            console.log(auth.getAuthHeader().Authorization)
-            //Check if user is authenticated
+        beforeCreate() {
             auth.checkAuth()
-            if(!auth.user.authenticated) {      
-                alert('You are not logged in! Please login to continue.')
-                this.$router.replace('/login')
-            }
         }
     }
 </script>

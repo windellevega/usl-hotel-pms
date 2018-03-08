@@ -53,12 +53,14 @@
 
 <script>
 import axios from 'axios'
-
-axios.defaults.baseURL = 'http://localhost:8000';
+import auth from './../../auth'
 
 export default {
     name: 'room-status-list',
     props: ['currstat', 'roomid'],
+    beforeCreate() {
+        auth.checkAuth()
+    },
     methods: {
         changeStatus(statid) {
             if(this.currstat != statid){

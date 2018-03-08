@@ -16,8 +16,7 @@
 
 <script>
 import axios from 'axios'
-
-axios.defaults.baseURL = 'http://localhost:8000';
+import auth from './../../auth'
 
 export default {
     name: 'room-reservations-list',
@@ -31,6 +30,9 @@ export default {
                 }
             }
         }
+    },
+    beforeCreate() {
+        auth.checkAuth()
     },
     created() {
         axios.get('/api/room/reservationdates/' + this.roomid)

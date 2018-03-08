@@ -138,60 +138,62 @@
 
 <script>
 import axios from 'axios'
+import auth from './../../auth'
 
 export default {
     name: 'booking-details',
     props: ['show', 'roomid'],
-    data() {
-        return {
-            headers: [
-                { text: 'Name', value: 'name' },
-                { text: 'Cost/Qty', value: 'costperqty'},
-                { text: 'Quantity', value: 'quantity'},
-                { text: 'Total Cost', value: 'total', align: 'right', class: 'pa-0' },
-                { text: '', value: ''}
-            ],
-            addcharge: {
-                othercharge_info: '',
-                quantity: null,
-                cost: null,
-                billingid: null
+    data: () => ({
+        headers: [
+            { text: 'Name', value: 'name' },
+            { text: 'Cost/Qty', value: 'costperqty'},
+            { text: 'Quantity', value: 'quantity'},
+            { text: 'Total Cost', value: 'total', align: 'right', class: 'pa-0' },
+            { text: '', value: ''}
+        ],
+        addcharge: {
+            othercharge_info: '',
+            quantity: null,
+            cost: null,
+            billingid: null
+        },
+        roomdetails: {
+            checkin: '',
+            checkout: '',
+            numberofpax: '',
+            remarks: '',
+            bookingcharge: 0.00,
+            room: {
+                room_name: ''
             },
-            roomdetails: {
-                checkin: '',
-                checkout: '',
-                numberofpax: '',
-                remarks: '',
-                bookingcharge: 0.00,
-                room: {
-                    room_name: ''
+            guest: {
+                fullname : '',
+                company: {
+                    companyname: ''
                 },
-                guest: {
-                    fullname : '',
-                    company: {
-                        companyname: ''
-                    },
-                    guest_type: {
-                        guesttype: ''
-                    }
-                },
-                booking_type: {
-                    bookingtype: ''
-                },
-                billing: {
-                    other_charge: [
-                        {
-                            id: 0,
-                            othercharge_info: '',
-                            quantity: '',
-                            cost: 0.00,
-                            totalcost: 0.00
-                        }
-                    ],
-                    downpayment: 0.00
+                guest_type: {
+                    guesttype: ''
                 }
+            },
+            booking_type: {
+                bookingtype: ''
+            },
+            billing: {
+                other_charge: [
+                    {
+                        id: 0,
+                        othercharge_info: '',
+                        quantity: '',
+                        cost: 0.00,
+                        totalcost: 0.00
+                    }
+                ],
+                downpayment: 0.00
             }
         }
+    }),
+    beforeCreate() {
+        auth.checkAuth()
     },
     methods: {
         close() {

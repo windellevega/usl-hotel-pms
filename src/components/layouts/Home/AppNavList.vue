@@ -81,7 +81,7 @@ export default {
                     text: 'Information Manager',
                     model: true,
                     children: [
-                        { icon: 'people', text: 'Customers', route: '/customers', active: false },
+                        { icon: 'people', text: 'Guests', route: '/guests', active: false },
                         { icon: 'style', text: 'Rooms', route: '/rooms', active: false },
                         { icon: 'lock', text: 'Accounts', route: '/accounts', active: false }
                     ]

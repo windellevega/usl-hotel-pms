@@ -93,7 +93,6 @@
                 if(this.$refs.form.validate()) {
                     this.active = true
                     auth.login(this, this.credentials)
-                    auth.checkAuth()
                 }
                 
             }

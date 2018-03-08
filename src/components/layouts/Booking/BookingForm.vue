@@ -139,78 +139,82 @@
 </template>
 
 <script>
-    import axios from 'axios'
+import axios from 'axios'
+import auth from './../../auth'
 
-    export default {
-        name: 'booking-form',
-        props: ['show', 'roomid'],
-        data() {
-            return {
-                formvalidation: false,
-                validationerrors: '',
-                guests: [],
-                bookingtypes: [],
-                bookingInfo: {
-                    billing: { downpayment: 0.00 } 
-                },
-            }
-        },
-        created() {
-            this.getGuestInfo()
-            this.getBookingTypes()
-        },
-        watch: {
-            roomid: function() {
-                this.bookingInfo.room_id = this.roomid
-            }
-        },
-        methods: {
-            getGuestInfo() {
-                //get all guest information
-                //for select menu
-                axios.get('/api/guests').then(response => {
-                    var item = []
-                    response.data.forEach(function(e) {
-                        item.push({text: e.fullname + ' (' + e.guest_type.guesttype + ') - ' + e.company.companyname, value: e.id})
-                    })
-                    this.guests = item
-                })
-                .catch(error => {
-                    console.log(error.message)
-                })
+export default {
+    name: 'booking-form',
+    props: ['show', 'roomid'],
+    data() {
+        return {
+            formvalidation: false,
+            validationerrors: '',
+            guests: [],
+            bookingtypes: [],
+            bookingInfo: {
+                billing: { downpayment: 0.00 } 
             },
-            getBookingTypes() {
-                //get all booking type information
-                //for select menu
-                axios.get('api/bookingtypes').then(response => {
-                    this.bookingtypes = response.data
+        }
+    },
+    beforeCreate() {
+        auth.checkAuth()
+    },
+    created() {
+        this.getGuestInfo()
+        this.getBookingTypes()
+    },
+    watch: {
+        roomid: function() {
+            this.bookingInfo.room_id = this.roomid
+        }
+    },
+    methods: {
+        getGuestInfo() {
+            //get all guest information
+            //for select menu
+            axios.get('/api/guests').then(response => {
+                var item = []
+                response.data.forEach(function(e) {
+                    item.push({text: e.fullname + ' (' + e.guest_type.guesttype + ') - ' + e.company.companyname, value: e.id})
                 })
-                .catch(error => {
-                    console.log(error.message)
-                })
-            },
-            close() {
-                this.$emit('closedialog', false)
-            },
-            saveBooking() {
-                console.log(this.bookingInfo)
-                axios.post('/api/booking', this.bookingInfo)
-                .then(response => {
-                    if(response.data.message) {
-                        alert(response.data.message)
-                        this.$parent.loadRooms()
-                        this.$emit('closedialog', false)
-                    }
-                    else {
-                        this.formvalidation = true
-                        this.validationerrors = response.data
-                    }
-                    
-                })
-                .catch(error => {
-                    console.log(error)
-                })
-            }
+                this.guests = item
+            })
+            .catch(error => {
+                console.log(error.message)
+            })
+        },
+        getBookingTypes() {
+            //get all booking type information
+            //for select menu
+            axios.get('api/bookingtypes').then(response => {
+                this.bookingtypes = response.data
+            })
+            .catch(error => {
+                console.log(error.message)
+            })
+        },
+        close() {
+            this.$emit('closedialog', false)
+        },
+        saveBooking() {
+            console.log(this.bookingInfo)
+            axios.post('/api/booking', this.bookingInfo)
+            .then(response => {
+                if(response.data.message) {
+                    alert(response.data.message)
+                    this.$parent.loadRooms()
+                    this.$emit('closedialog', false)
+                }
+                else {
+                    this.formvalidation = true
+                    this.validationerrors = response.data
+                }
+                
+            })
+            .catch(error => {
+                console.log(error)
+            })
         }
     }
+}
 </script>

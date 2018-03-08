@@ -134,6 +134,9 @@ export default {
             roomidbooking: null
         }
     },
+    beforeCreate() {
+        auth.checkAuth()
+    },
     methods: {
         showRoomDetailsDialog(roomid) {
             this.roomiddetails = roomid

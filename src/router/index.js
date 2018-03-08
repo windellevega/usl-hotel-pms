@@ -4,7 +4,7 @@ import Login from '@/components/Login.vue'
 import Main from '@/components/Main.vue'
 import Booking from '@/components/layouts/Main/Booking.vue'
 import Reservation from '@/components/layouts/Main/Reservation.vue'
-import Customers from '@/components/layouts/Main/Customers.vue'
+import Customers from '@/components/layouts/Main/Guests.vue'
 import Rooms from '@/components/layouts/Main/Rooms.vue'
 import Accounts from '@/components/layouts/Main/Accounts.vue'
 
@@ -29,8 +29,8 @@ export default new Router({
             component: Reservation,
           },
           {
-            path: '/customers',
-            name: 'Customers',
+            path: '/guests',
+            name: 'Guests',
             component: Customers,
           },
           {
