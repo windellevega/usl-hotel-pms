@@ -37,6 +37,7 @@ export default {
     logout() {
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
+        localStorage.removeItem('expires_at')
     },
     checkAuth() {
         let currTime = new Date()

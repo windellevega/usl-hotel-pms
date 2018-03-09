@@ -70,7 +70,7 @@
                             </v-flex>
                             <v-flex xs12 sm12 md12 py-1>
                                 <v-expansion-panel popout>
-                                    <v-expansion-panel-content hide-actions :value="showgtform">
+                                    <v-expansion-panel-content hide-actions>
                                         <div slot="header" class=".body-1"><v-icon color="green darken-1">add_box</v-icon> <strong>Add Guest Type (If guest type is not on list)</strong></div>
                                         <v-card>
                                             <v-card-text>
@@ -174,7 +174,6 @@ import auth from './../../auth'
 
 export default {
     data: () => ({
-        showgtform: '',
         formvalidation: false,
         validationerrors: '',
         dialog: false,
@@ -258,7 +257,6 @@ export default {
             axios.post('/api/guesttype', { guesttype: this.guesttype })
             .then(response => {
                 alert(response.data.message)
-                this.showgtform = ''
                 this.getGuestTypes()
                 this.$refs.addguesttypeform.reset()
             })
@@ -267,7 +265,15 @@ export default {
             })
         },
         addCompany() {
-            //add codes here
+            axios.post('/api/company', this.company)
+            .then(response => {
+                alert(response.data.message)
+                this.getCompanies()
+                this.$refs.addcompanyform.reset()
+            })
+            .catch(error => {
+                console.log(error)
+            })
         },
         editItem (item) {
             this.editedIndex = this.guests.indexOf(item)

@@ -7,31 +7,92 @@
             </v-flex>
         </v-layout>
         <v-dialog v-model="dialog" max-width="500px">
-            <v-btn color="primary" dark slot="activator" class="mb-2">New ACCOUNT</v-btn>
+            <v-btn color="primary" dark slot="activator" class="mb-2">New Account</v-btn>
             <v-card>
                 <v-card-title>
                     <span class="headline">{{ formTitle }}</span>
                 </v-card-title>
                 <v-card-text>
-                    <v-container grid-list-md>
-                        <v-layout wrap>
-                        <v-flex xs12 sm6 md4>
-                            <v-text-field label="Dessert name" v-model="editedItem.name"></v-text-field>
-                        </v-flex>
-                        <v-flex xs12 sm6 md4>
-                            <v-text-field label="Calories" v-model="editedItem.calories"></v-text-field>
-                        </v-flex>
-                        <v-flex xs12 sm6 md4>
-                            <v-text-field label="Fat (g)" v-model="editedItem.fat"></v-text-field>
-                        </v-flex>
-                        <v-flex xs12 sm6 md4>
-                            <v-text-field label="Carbs (g)" v-model="editedItem.carbs"></v-text-field>
-                        </v-flex>
-                        <v-flex xs12 sm6 md4>
-                            <v-text-field label="Protein (g)" v-model="editedItem.protein"></v-text-field>
-                        </v-flex>
-                        </v-layout>
-                    </v-container>
+                    <v-form ref="adduserform">
+                        <v-container grid-list-md>
+                            <v-layout v-if="formvalidation" wrap>
+                                <v-flex py-0 fill-height xs12 sm6 md6 v-for="(error,i) in validationerrors" :key="i">
+                                    <p py-0
+                                        style="color:#FF1744"
+                                        class="caption font-weight 400" 
+                                        >
+                                        *{{ error }}
+                                    </p>
+                                </v-flex>
+                            </v-layout>
+                            <v-layout wrap>
+                                <v-flex xs12 sm6 md6>
+                                    <v-text-field 
+                                        prepend-icon="person"
+                                        label="First Name" 
+                                        v-model="editedItem.firstname"
+                                        :rules="firstnameRules"
+                                        required
+                                    ></v-text-field>
+                                </v-flex>
+                                <v-flex xs12 sm6 md6>
+                                    <v-text-field 
+                                        label="Last Name" 
+                                        v-model="editedItem.lastname"
+                                        :rules="lastnameRules"
+                                        required
+                                    ></v-text-field>
+                                </v-flex>
+                                <v-flex xs12 sm12 md12>
+                                    <v-text-field v-if="this.editedIndex === -1"
+                                        prepend-icon="person"
+                                        label="Username" 
+                                        v-model="editedItem.username"
+                                        :rules="usernameRules"
+                                        required
+                                    ></v-text-field>
+                                    <v-text-field v-else
+                                        prepend-icon="person"
+                                        label="Username" 
+                                        v-model="editedItem.username"
+                                        readonly
+                                        required
+                                    ></v-text-field>
+                                </v-flex>
+                                <v-flex v-if="this.editedIndex !== -1" xs12 sm12 md12>
+                                    <v-text-field 
+                                        prepend-icon="vpn_key"
+                                        label="Old Password"
+                                        v-model="editedItem.oldpassword"
+                                        :rules="oldPasswordRules"
+                                        type="password"
+                                        required
+                                    ></v-text-field>
+                                </v-flex>
+                                <v-flex xs12 sm12 md12>
+                                    <v-text-field 
+                                        prepend-icon="vpn_key"
+                                        label="Password" 
+                                        id="password"
+                                        v-model="editedItem.password"
+                                        :rules="passwordRules"
+                                        type="password"
+                                        required
+                                    ></v-text-field>
+                                </v-flex>
+                                <v-flex xs12 sm12 md12>
+                                    <v-text-field 
+                                        prepend-icon="vpn_key"
+                                        label="Verify Password" 
+                                        v-model="editedItem.verifypassword"
+                                        :rules="verifyPasswordRules"
+                                        type="password"
+                                        required
+                                    ></v-text-field>
+                                </v-flex>
+                            </v-layout>
+                        </v-container>
+                    </v-form>
                 </v-card-text>
                 <v-card-actions>
                     <v-spacer></v-spacer>
@@ -40,18 +101,20 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-alert :type="alerttype" dismissible v-model="alert" transition="slide-y-transition">
+            {{ alertmessage }}
+        </v-alert>
         <v-data-table
         :headers="headers"
-        :items="items"
+        :items="users"
         hide-actions
         class="elevation-1"
         >
         <template slot="items" slot-scope="props">
-            <td>{{ props.item.name }}</td>
-            <td class="text-xs-right">{{ props.item.calories }}</td>
-            <td class="text-xs-right">{{ props.item.fat }}</td>
-            <td class="text-xs-right">{{ props.item.carbs }}</td>
-            <td class="text-xs-right">{{ props.item.protein }}</td>
+            <td>{{ props.item.firstname }}</td>
+            <td>{{ props.item.lastname }}</td>
+            <td>{{ props.item.username }}</td>
+            <td>{{ props.item.created_at }}</td>
             <td class="justify-center layout px-0">
             <v-btn icon class="mx-0" @click="editItem(props.item)">
                 <v-icon color="teal">edit</v-icon>
@@ -62,170 +125,166 @@
             </td>
         </template>
         <template slot="no-data">
-            <v-btn color="primary" @click="initialize">Reset</v-btn>
+            <td colspan="5" class="text-xs-center">There are no users to show.</td>
         </template>
         </v-data-table>
     </div>
 </template>
 
 <script>
+import axios from 'axios'
 import auth from './../../auth'
 
 export default {
     data: () => ({
+        formvalidation: false,
+        validationerrors: '',
         dialog: false,
+        alert: false,
+        alerttype: 'success',
+        alertmessage: 'Success',
+        editedItem: {},
+        firstnameRules: [
+            v => !!v || 'First Name is required',
+        ],
+        lastnameRules: [
+            v => !!v || 'Last Name is required',
+        ],
+        usernameRules: [
+            v => !!v || 'Username is required',
+        ],
+        passwordRules: [
+            v => !!v || 'Password is required',
+        ],
+        oldPasswordRules: [
+            v => !!v || 'Password is required',
+        ],
+        verifyPasswordRules: [
+            v => !!v || 'Please confirm password',
+            v => (v) == password.value || 'Password mismatch'
+        ],
         headers: [
-            {
-                text: 'Dessert (100g serving)',
-                align: 'left',
-                sortable: false,
-                value: 'name'
-            },
-            { text: 'Calories', value: 'calories' },
-            { text: 'Fat (g)', value: 'fat' },
-            { text: 'Carbs (g)', value: 'carbs' },
-            { text: 'Protein (g)', value: 'protein' },
+            { text: 'First Name', value: 'firstname' },
+            { text: 'Last Name', value: 'lastname' },
+            { text: 'Username', value: 'username' },
+            { text: 'Date Created', value: 'date_created' },
             { text: 'Actions', value: 'name', sortable: false }
         ],
-        items: [],
-        editedIndex: -1,
-        editedItem: {
-            name: '',
-            calories: 0,
-            fat: 0,
-            carbs: 0,
-            protein: 0
-        },
-        defaultItem: {
-            name: '',
-            calories: 0,
-            fat: 0,
-            carbs: 0,
-            protein: 0
-        }
+        users: [],
+        editedIndex: -1
     }),
     beforeCreate() {
         auth.checkAuth()
     },
     computed: {
-    formTitle () {
-        return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
-    }
+        formTitle () {
+            return this.editedIndex === -1 ? 'Register User' : 'Edit User'
+        }
     },
 
     watch: {
-    dialog (val) {
-        val || this.close()
-    }
+        dialog (val) {
+            val || this.close()
+        }
     },
 
     created () {
-    this.initialize()
+        this.getUsers()
     },
 
     methods: {
-    initialize () {
-        this.items = [
-        {
-            name: 'Frozen Yogurt',
-            calories: 159,
-            fat: 6.0,
-            carbs: 24,
-            protein: 4.0
+        getUsers() {
+            axios.get('/api/users')
+            .then(response => {
+                if(response.data.message == undefined) {
+                    this.users = response.data
+                }
+            })
+            .catch(error => {
+                console.log(error)
+            })
         },
-        {
-            name: 'Ice cream sandwich',
-            calories: 237,
-            fat: 9.0,
-            carbs: 37,
-            protein: 4.3
+
+        editItem (item) {
+            this.editedIndex = this.users.indexOf(item)
+            this.editedItem = Object.assign({}, item)
+            this.dialog = true
         },
-        {
-            name: 'Eclair',
-            calories: 262,
-            fat: 16.0,
-            carbs: 23,
-            protein: 6.0
+
+        deleteItem (item) {
+            const index = this.users.indexOf(item)
+            if(confirm('Are you sure you want to delete this user?')) {
+                axios.delete('/api/user/' + item.id)
+                .then(response => {
+                    this.users.splice(index, 1)
+                    this.alertmessage = response.data.message
+                    this.alerttype = 'info'
+                    this.alert = true
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+            }
         },
-        {
-            name: 'Cupcake',
-            calories: 305,
-            fat: 3.7,
-            carbs: 67,
-            protein: 4.3
+
+        close () {
+            this.$refs.adduserform.reset()
+            this.formvalidation = true
+            this.validationerrors = ''
+            this.dialog = false
+            setTimeout(() => {
+            this.editedItem = Object.assign({}, this.defaultItem)
+            this.editedIndex = -1
+            }, 300)
         },
-        {
-            name: 'Gingerbread',
-            calories: 356,
-            fat: 16.0,
-            carbs: 49,
-            protein: 3.9
-        },
-        {
-            name: 'Jelly bean',
-            calories: 375,
-            fat: 0.0,
-            carbs: 94,
-            protein: 0.0
-        },
-        {
-            name: 'Lollipop',
-            calories: 392,
-            fat: 0.2,
-            carbs: 98,
-            protein: 0
-        },
-        {
-            name: 'Honeycomb',
-            calories: 408,
-            fat: 3.2,
-            carbs: 87,
-            protein: 6.5
-        },
-        {
-            name: 'Donut',
-            calories: 452,
-            fat: 25.0,
-            carbs: 51,
-            protein: 4.9
-        },
-        {
-            name: 'KitKat',
-            calories: 518,
-            fat: 26.0,
-            carbs: 65,
-            protein: 7
+
+        save () {
+            if(this.$refs.adduserform.validate()) {
+                if(this.editedItem.id == undefined) {
+                    console.log(this.editedItem)
+                    axios.post('/api/user', this.editedItem)
+                    .then(response => {
+                        //Check for backend validation errors
+                        if(response.data.message) {
+                            this.close()
+                            this.getUsers()
+                            this.alertmessage = response.data.message
+                            this.alerttype = 'success'
+                            this.alert = true
+                        }
+                        else {
+                            this.formvalidation = true
+                            this.validationerrors = response.data
+                        }
+                    })
+                }
+                else {
+                    console.log(this.editedItem.id)
+                    console.log(this.editedItem)
+                    axios.patch('/api/user/' + this.editedItem.id, this.editedItem)
+                    .then(response => {
+                        //Check for validation errors
+                        if(response.data.message) {
+                            this.close()
+                            this.getUsers()
+                            this.alertmessage = response.data.message
+                            this.alerttype = 'success'
+                            this.alert = true
+                        }
+                        else {
+                            this.formvalidation = true
+                            this.validationerrors = response.data
+                        }
+                    })
+                }
+            }
+            /*if (this.editedIndex > -1) {
+                Object.assign(this.items[this.editedIndex], this.editedItem)
+            } else {
+                
+            }
+            this.close()*/
         }
-        ]
-    },
-
-    editItem (item) {
-        this.editedIndex = this.items.indexOf(item)
-        this.editedItem = Object.assign({}, item)
-        this.dialog = true
-    },
-
-    deleteItem (item) {
-        const index = this.items.indexOf(item)
-        confirm('Are you sure you want to delete this item?') && this.items.splice(index, 1)
-    },
-
-    close () {
-        this.dialog = false
-        setTimeout(() => {
-        this.editedItem = Object.assign({}, this.defaultItem)
-        this.editedIndex = -1
-        }, 300)
-    },
-
-    save () {
-        if (this.editedIndex > -1) {
-        Object.assign(this.items[this.editedIndex], this.editedItem)
-        } else {
-        this.items.push(this.editedItem)
-        }
-        this.close()
-    }
     }
 }
 </script>

@@ -1,69 +1,73 @@
 <template>
-    
-        <v-list dense>
-            <div v-for="(item, i) in items" :key="i">
-                <v-layout
-                    row
-                    v-if="item.heading"
-                    align-center
-                    :key="i"
-                >
-                    <v-flex xs6>
-                        <v-subheader v-if="item.heading">
-                            {{ item.heading }}
-                        </v-subheader>
-                    </v-flex>
-                </v-layout>
-                <v-list-group 
-                    v-else-if="item.children"
-                    v-model="item.model"
-                    :key="item.text"
-                    :prepend-icon="item.model ? item.icon : item['icon-alt']"
-                    append-icon="">
-                    <v-list-tile slot="activator">
-                        <v-list-tile-content>
-                            <v-list-tile-title>
-                                {{ item.text }}
-                            </v-list-tile-title>
-                        </v-list-tile-content>
-                    </v-list-tile>
-                    <v-list-tile
-                        v-for="(child, i) in item.children"
-                        :key="i"
-                        :to="child.route"
-                    >
-                        <v-list-tile-action v-if="child.icon">
-                            <v-icon>{{ child.icon }}</v-icon>
-                        </v-list-tile-action>
-                        <v-list-tile-content>
-                            <v-list-tile-title>
-                                {{ child.text }}
-                            </v-list-tile-title>
-                        </v-list-tile-content>
-                    </v-list-tile>
-                </v-list-group>
-                <v-list-tile v-else :to="item.route" :value="item.active">
-                    <v-list-tile-action>
-                        <v-icon>{{ item.icon }}</v-icon>
-                    </v-list-tile-action>
+    <v-list dense>
+        <template v-for="item in items">
+            <v-layout
+                row
+                v-if="item.heading"
+                align-center
+                :key="item.heading"
+            >
+                <v-flex xs6>
+                    <v-subheader v-if="item.heading">
+                        {{ item.heading }}
+                    </v-subheader>
+                </v-flex>
+            </v-layout>
+            <v-list-group 
+                v-else-if="item.children"
+                v-model="item.model"
+                :key="item.text"
+                :prepend-icon="item.model ? item.icon : item['icon-alt']"
+                append-icon="">
+                <v-list-tile slot="activator">
                     <v-list-tile-content>
                         <v-list-tile-title>
                             {{ item.text }}
                         </v-list-tile-title>
                     </v-list-tile-content>
                 </v-list-tile>
-            </div>
-            <v-layout>
-                <v-flex py-2 style="padding-left:4px;">
-                    <v-date-picker 
-                        color="primary" 
-                        header-color="blue darken-3"
-                        v-model="today"
-                    >
-                    </v-date-picker>
-                </v-flex>
-            </v-layout>
-        </v-list>  
+                <v-list-tile
+                    v-for="(child, i) in item.children"
+                    :key="i"
+                    :to="child.route"
+                >
+                    <v-list-tile-action v-if="child.icon">
+                        <v-icon>{{ child.icon }}</v-icon>
+                    </v-list-tile-action>
+                    <v-list-tile-content>
+                        <v-list-tile-title>
+                            {{ child.text }}
+                        </v-list-tile-title>
+                    </v-list-tile-content>
+                </v-list-tile>
+            </v-list-group>
+            <v-list-tile 
+                v-else 
+                :to="item.route" 
+                :key="item.text" 
+                :value="item.active"
+            >
+                <v-list-tile-action>
+                    <v-icon>{{ item.icon }}</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                    <v-list-tile-title>
+                        {{ item.text }}
+                    </v-list-tile-title>
+                </v-list-tile-content>
+            </v-list-tile>
+        </template>
+        <v-layout>
+            <v-flex py-2 style="padding-left:4px;">
+                <v-date-picker 
+                    color="primary" 
+                    header-color="blue darken-3"
+                    v-model="today"
+                >
+                </v-date-picker>
+            </v-flex>
+        </v-layout>
+    </v-list>  
 </template>
 
 <script>
