@@ -1,5 +1,11 @@
 <template>
     <div>
+        <v-layout>
+            <v-flex xs12 sm12>
+                <h2 class="display-1">GUESTS</h2>
+                <br>
+            </v-flex>
+        </v-layout>
         <v-dialog v-model="dialog" max-width="600px">
             <v-btn color="primary" dark slot="activator" class="mb-2">New Guest</v-btn>
             <v-card>
@@ -72,6 +78,10 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-alert :type="alerttype" dismissible v-model="alert" transition="slide-y-transition">
+            {{ alertmessage }}
+        </v-alert>
+        <br>
         <v-data-table
         :headers="headers"
         :items="guests"
@@ -110,6 +120,9 @@ export default {
         formvalidation: false,
         validationerrors: '',
         dialog: false,
+        alert: false,
+        alerttype: 'success',
+        alertmessage: 'Success',
         headers: [
             { text: 'Guest Name', value: 'fullname' },
             { text: 'Guest Type', value: 'guest_type.guesttype' },
@@ -189,7 +202,18 @@ export default {
 
         deleteItem (item) {
             const index = this.guests.indexOf(item)
-            confirm('Are you sure you want to delete this item?') && this.guests.splice(index, 1)
+            if(confirm('Are you sure you want to delete this item?')) {
+                axios.delete('/api/guest/' + item.id)
+                .then(response => {
+                    this.guests.splice(index, 1)
+                    this.alertmessage = response.data.message
+                    this.alerttype = 'info'
+                    this.alert = true
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+            }
         },
 
         close () {
@@ -209,7 +233,9 @@ export default {
                     if(response.data.message) {
                         this.close()
                         this.getGuests()
-                        alert(response.data.message)
+                        this.alertmessage = response.data.message
+                        this.alerttype = 'success'
+                        this.alert = true
                     }
                     else {
                         this.formvalidation = true
@@ -218,14 +244,22 @@ export default {
                 })
             }
             else {
-
+                axios.patch('/api/guest/' + this.editedItem.id, this.editedItem)
+                .then(response => {
+                    //Check for validation errors
+                    if(response.data.message) {
+                        this.close()
+                        this.getGuests()
+                        this.alertmessage = response.data.message
+                        this.alerttype = 'success'
+                        this.alert = true
+                    }
+                    else {
+                        this.formvalidation = true
+                        this.validationerrors = response.data
+                    }
+                })
             }
-            /*if (this.editedIndex > -1) {
-                Object.assign(this.guests[this.editedIndex], this.editedItem)
-            } else {
-                this.guests.push(this.editedItem)
-            }
-            this.close()*/
         }
     }
 }

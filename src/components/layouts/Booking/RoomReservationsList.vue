@@ -31,9 +31,6 @@ export default {
             }
         }
     },
-    beforeCreate() {
-        auth.checkAuth()
-    },
     created() {
         axios.get('/api/room/reservationdates/' + this.roomid)
             .then(response => {

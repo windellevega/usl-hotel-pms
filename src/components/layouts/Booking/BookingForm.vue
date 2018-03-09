@@ -156,9 +156,6 @@ export default {
             },
         }
     },
-    beforeCreate() {
-        auth.checkAuth()
-    },
     created() {
         this.getGuestInfo()
         this.getBookingTypes()

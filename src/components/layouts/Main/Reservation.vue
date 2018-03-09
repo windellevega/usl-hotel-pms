@@ -1,5 +1,11 @@
 <template>
     <div>
+        <v-layout>
+            <v-flex xs12 sm12>
+                <h2 class="display-1">HOTEL RESERVATIONS</h2>
+                <br>
+            </v-flex>
+        </v-layout>
         <v-dialog persistent v-model="dialog" max-width="700px">
             <v-btn color="primary" dark slot="activator" class="mb-2">New Reservation</v-btn>
             <v-card>
@@ -202,6 +208,10 @@
                 </v-form>
             </v-card>
         </v-dialog>
+        <v-alert :type="alerttype" dismissible v-model="alert" transition="slide-y-transition">
+            {{ alertmessage }}
+        </v-alert>
+        <br>
         <v-data-table
         :headers="headers"
         :items="reservations"
@@ -242,6 +252,9 @@ export default {
         formvalidation: false,
         validationerrors: '',
         dialog: false,
+        alert: false,
+        alerttype: 'success',
+        alertmessage: '',
         headers: [
             {
                 text: 'Room Name', value: 'room.room_name'
@@ -354,7 +367,10 @@ export default {
                 this.reservations.splice(index, 1)
                 axios.delete('api/booking/' + item.id)
                 .then(response => {
-                    console.log(response.data.message)
+                    this.setAlert('info', response.data.message)
+                })
+                .catch(error => {
+                    console.log(error)
                 })
             }
             
@@ -375,7 +391,8 @@ export default {
                     if(response.data.message) {
                         this.close()
                         this.getReservations()
-                        alert(response.data.message)
+                        this.alert = true
+                        this.setAlert('success', response.data.message)
                     }
                     else {
                         this.formvalidation = true
@@ -392,7 +409,7 @@ export default {
                     if(response.data.message) {
                         this.close()
                         this.getReservations()
-                        alert(response.data.message)
+                        this.setAlert('success', response.data.message)
                     }
                     else {
                         this.formvalidation = true
@@ -411,6 +428,11 @@ export default {
             var today = new Date()
             var cmindate = new Date(today.getTime() + (24 * 60 * 60 * 1000));
             this.cmindate = cmindate.toISOString().substr(0,10)
+        },
+        setAlert(type, message) {
+            this.alert = true
+            this.alerttype = type
+            this.alertmessage = message
         }
     }
 }

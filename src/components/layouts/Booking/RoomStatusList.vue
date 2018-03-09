@@ -58,9 +58,6 @@ import auth from './../../auth'
 export default {
     name: 'room-status-list',
     props: ['currstat', 'roomid'],
-    beforeCreate() {
-        auth.checkAuth()
-    },
     methods: {
         changeStatus(statid) {
             if(this.currstat != statid){

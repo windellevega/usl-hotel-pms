@@ -192,9 +192,6 @@ export default {
             }
         }
     }),
-    beforeCreate() {
-        auth.checkAuth()
-    },
     methods: {
         close() {
             this.$emit('closedialog', false)

@@ -54,7 +54,7 @@
     axios.defaults.baseURL = 'http://localhost:8000'
     axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
     axios.defaults.headers.common['Accept'] = 'application/json'
-    axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
+    
 
     export default {
         data: () => ({
@@ -65,6 +65,7 @@
         },
         beforeCreate() {
             auth.checkAuth()
+            axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('access_token')
         }
     }
 </script>
