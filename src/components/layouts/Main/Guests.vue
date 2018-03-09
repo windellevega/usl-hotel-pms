@@ -40,14 +40,6 @@
                                     required
                                 ></v-text-field>
                             </v-flex>
-                             <v-flex xs12 sm6 md6>
-                                <v-text-field 
-                                    prepend-icon="phone"
-                                    label="Contact Number" 
-                                    v-model="editedItem.contactno"
-                                    required
-                                ></v-text-field>
-                            </v-flex>
                             <v-flex xs12 sm6 md6>
                                 <v-select
                                     prepend-icon="group"
@@ -58,15 +50,80 @@
                                     v-model="editedItem.guesttype_id"
                                 ></v-select>
                             </v-flex>
+                            <v-flex xs12 sm6 md6>
+                                <v-text-field 
+                                    prepend-icon="phone"
+                                    label="Contact Number" 
+                                    v-model="editedItem.contactno"
+                                    required
+                                ></v-text-field>
+                            </v-flex>
                             <v-flex xs12 sm12 md12>
                                 <v-select
-                                    prepend-icon="group"
+                                    prepend-icon="business"
                                     :items="companies"
                                     label="Company Name"
                                     required
                                     bottom
                                     v-model="editedItem.company_id"
                                 ></v-select>
+                            </v-flex>
+                            <v-flex xs12 sm12 md12 py-1>
+                                <v-expansion-panel popout>
+                                    <v-expansion-panel-content hide-actions :value="showgtform">
+                                        <div slot="header" class=".body-1"><v-icon color="green darken-1">add_box</v-icon> <strong>Add Guest Type (If guest type is not on list)</strong></div>
+                                        <v-card>
+                                            <v-card-text>
+                                                <v-form ref="addguesttypeform">
+                                                    <v-layout row>
+                                                        <v-flex xs12 sm7 md7 offset-sm1 offset-md1 px-2>
+                                                            <v-text-field 
+                                                                label="Guest Type" 
+                                                                v-model="guesttype"
+                                                                required
+                                                            ></v-text-field>
+                                                        </v-flex>
+                                                        <v-flex xs12 sm3 md3 px-2 small>
+                                                            <v-btn @click="addGuestType()" color="primary">Add</v-btn>
+                                                        </v-flex>
+                                                    </v-layout>
+                                                </v-form>
+                                            </v-card-text>
+                                        </v-card>
+                                    </v-expansion-panel-content>
+                                </v-expansion-panel>
+                            </v-flex>
+                            <v-flex xs12 sm12 md12 py-1>
+                                <v-expansion-panel popout>
+                                    <v-expansion-panel-content hide-actions>
+                                        <div slot="header" class=".body-1"><v-icon color="green darken-1">add_box</v-icon> <strong>Add Company (If company is not on list)</strong></div>
+                                        <v-card>
+                                            <v-card-text>
+                                                <v-form ref="addcompanyform">
+                                                    <v-layout wrap>
+                                                        <v-flex xs12 sm10 md10 offset-sm1 offset-md1 px-2>
+                                                            <v-text-field 
+                                                                label="Company Name" 
+                                                                v-model="company.companyname"
+                                                                required
+                                                            ></v-text-field>
+                                                        </v-flex>
+                                                        <v-flex xs12 sm10 md10 offset-sm1 offset-md1 px-2>
+                                                            <v-text-field 
+                                                                label="Company Address" 
+                                                                v-model="company.companyaddress"
+                                                                required
+                                                            ></v-text-field>
+                                                        </v-flex>
+                                                        <v-flex offset-sm8 offset-md8 xs12 sm3 md3 px-2 small>
+                                                            <v-btn @click="addCompany()" color="primary">Add</v-btn>
+                                                        </v-flex>
+                                                    </v-layout>
+                                                </v-form>
+                                            </v-card-text>
+                                        </v-card>
+                                    </v-expansion-panel-content>
+                                </v-expansion-panel>
                             </v-flex>
                         </v-layout>
                     </v-container>
@@ -117,6 +174,7 @@ import auth from './../../auth'
 
 export default {
     data: () => ({
+        showgtform: '',
         formvalidation: false,
         validationerrors: '',
         dialog: false,
@@ -130,9 +188,11 @@ export default {
             { text: 'Company', value: 'company.companyname' },
             { text: 'Actions', value: 'name', sortable: false }
         ],
+        guesttype: '',
         guests: [],
         guesttypes: [],
         companies: [],
+        company: { companyname: '', companyaddress: '' },
         editedIndex: -1,
         editedItem: {
         },
@@ -194,6 +254,21 @@ export default {
                 console.log(error)
             })
         },
+        addGuestType() {
+            axios.post('/api/guesttype', { guesttype: this.guesttype })
+            .then(response => {
+                alert(response.data.message)
+                this.showgtform = ''
+                this.getGuestTypes()
+                this.$refs.addguesttypeform.reset()
+            })
+            .catch(error => {
+                console.log(error)
+            })
+        },
+        addCompany() {
+            //add codes here
+        },
         editItem (item) {
             this.editedIndex = this.guests.indexOf(item)
             this.editedItem = Object.assign({}, item)
@@ -223,8 +298,7 @@ export default {
                 this.editedIndex = -1
             }, 300)
         },
-
-        save () {
+        save() {
             console.log(this.editedItem)
             if(this.editedItem.id == undefined) {
                 axios.post('/api/guest', this.editedItem)

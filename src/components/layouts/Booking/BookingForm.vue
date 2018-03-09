@@ -2,7 +2,7 @@
     <v-layout row justify-center>
         <v-dialog persistent v-model="show" max-width="700px">
             <v-card>
-                <v-form>
+                <v-form ref="bookingform">
                     <v-card-title>
                         <span class="headline" py-0>New Booking</span>
                     </v-card-title>
@@ -43,7 +43,7 @@
                                     >
                                         <v-text-field
                                             slot="activator"
-                                            label="Departure Date"
+                                            label="Check-out Date"
                                             v-model="bookingInfo.checkoutdate"
                                             prepend-icon="event"
                                             readonly
@@ -70,7 +70,7 @@
                                     >
                                         <v-text-field
                                             slot="activator"
-                                            label="Departure Time"
+                                            label="Check-out Time"
                                             v-model="bookingInfo.checkouttime"
                                             prepend-icon="access_time"
                                             readonly
@@ -191,6 +191,9 @@ export default {
             })
         },
         close() {
+            this.$refs.bookingform.reset()
+            this.formvalidation = true
+            this.validationerrors = ''
             this.$emit('closedialog', false)
         },
         saveBooking() {
@@ -199,7 +202,7 @@ export default {
             .then(response => {
                 if(response.data.message) {
                     alert(response.data.message)
-                    this.$parent.loadRooms()
+                    this.$parent.loadRooms()    
                     this.$emit('closedialog', false)
                 }
                 else {

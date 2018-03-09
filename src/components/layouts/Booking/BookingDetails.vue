@@ -6,28 +6,28 @@
                 <v-card-text>
                     <v-layout row wrap>
                         <v-flex xs12 sm12 py-1>  
-                            <strong>ROOM: </strong>{{ roomdetails.room.room_name }}
+                            <strong>ROOM: </strong>{{ bookingdetails.room.room_name }}
                         </v-flex>
                         <v-flex xs12 sm12 py-1>  
-                            <strong>GUEST: </strong>{{ roomdetails.guest.fullname }} ({{ roomdetails.guest.guest_type.guesttype }}) - {{ roomdetails.guest.company.companyname }}
+                            <strong>GUEST: </strong>{{ bookingdetails.guest.fullname }} ({{ bookingdetails.guest.guest_type.guesttype }}) - {{ bookingdetails.guest.company.companyname }}
                         </v-flex>
                         <v-flex xs12 sm6 md6 py-1>  
-                            <strong>CHECK-IN: </strong>{{ roomdetails.checkin }}
+                            <strong>CHECK-IN: </strong>{{ bookingdetails.checkin }}
                         </v-flex>
                         <v-flex xs12 sm6 md6 py-1>  
-                            <strong>CHECK-OUT: </strong>{{ roomdetails.checkout }}
+                            <strong>CHECK-OUT: </strong>{{ bookingdetails.checkout }}
                         </v-flex>
                         <v-flex xs12 sm6 md6 py-1>  
-                            <strong>NO. OF PAX: </strong>{{ roomdetails.numberofpax }}
+                            <strong>NO. OF PAX: </strong>{{ bookingdetails.numberofpax }}
                         </v-flex>
                         <v-flex xs12 sm6 md6 py-1>  
-                            <strong>BOOKING TYPE: </strong>{{ roomdetails.booking_type.bookingtype }}
+                            <strong>BOOKING TYPE: </strong>{{ bookingdetails.booking_type.bookingtype }}
                         </v-flex>
                         <v-flex xs12 sm12 md12 pt-1>  
                             <strong>REMARKS: </strong>
                         </v-flex>
                         <v-flex xs12 sm12 md12 pb-1>  
-                            {{ roomdetails.remarks }}
+                            {{ bookingdetails.remarks }}
                         </v-flex>
                         <v-flex xs12 sm12 md12 py-1>  
                             <strong>OTHER CHARGES: </strong>
@@ -35,7 +35,7 @@
                         <v-flex xs12 sm12 md12 py-1>
                             <v-data-table
                                 :headers="headers"
-                                :items="roomdetails.billing.other_charge"
+                                :items="bookingdetails.billing.other_charge"
                                 hide-actions
                                 class="elevation-1"
                             >
@@ -67,10 +67,10 @@
                                     <td class="text-xs-right pa-0">
                                         <span class="caption">
                                             ₱{{ totalOtherCharge }}<br>
-                                            ₱{{ roomdetails.bookingcharge }}<br>
+                                            ₱{{ bookingdetails.bookingcharge }}<br>
                                             ---------------<br>
                                             ₱{{ totalCharges }}<br>
-                                            <span style="color:#E5143D">₱{{ roomdetails.billing.downpayment }}</span><br>
+                                            <span style="color:#E5143D">₱{{ bookingdetails.billing.downpayment }}</span><br>
                                             -----------------<br>
                                         </span>
                                         <strong>
@@ -129,8 +129,25 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" flat="flat" @click.native="close()">Close</v-btn>
-                    <v-btn color="blue darken-1" flat="flat" @click.native="close()">Check-out</v-btn>
+                    <v-btn color="blue darken-1" flat="flat" @click.stop="statusdialog = true">Check-out</v-btn>
                 </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="statusdialog" max-width="500px">
+            <v-card>
+            <v-card-title>
+                <strong>Room Status After Check-Out</strong>
+            </v-card-title>
+            <v-card-text>
+                <v-select
+                    :items="roomstatuses"
+                    label="Select room status"
+                    v-model="roomstatus"
+                ></v-select>
+            </v-card-text>
+            <v-card-actions>
+                <v-btn color="primary" flat @click.stop="checkout()">Check-out</v-btn>
+            </v-card-actions>
             </v-card>
         </v-dialog>
     </v-layout>
@@ -144,6 +161,14 @@ export default {
     name: 'booking-details',
     props: ['show', 'roomid'],
     data: () => ({
+        statusdialog: false,
+        roomstatus: 2,
+        roomstatuses: [
+            { value: 1, text: 'VR - Vacant Ready'},
+            { value: 2, text: 'VC - Vacant Clean'},
+            { value: 3, text: 'VD - Vacant Dirty'},
+            { value: 6, text: 'OOO - Out of Order'}
+        ],
         headers: [
             { text: 'Name', value: 'name' },
             { text: 'Cost/Qty', value: 'costperqty'},
@@ -157,7 +182,7 @@ export default {
             cost: null,
             billingid: null
         },
-        roomdetails: {
+        bookingdetails: {
             checkin: '',
             checkout: '',
             numberofpax: '',
@@ -199,9 +224,9 @@ export default {
         addOtherCharge() {
             axios.post('/api/othercharge', this.addcharge)
             .then(response => {
-                axios.get('/api/othercharges/' + this.roomdetails.billing.id).
+                axios.get('/api/othercharges/' + this.bookingdetails.billing.id).
                 then(response => {
-                    this.roomdetails.billing.other_charge = response.data
+                    this.bookingdetails.billing.other_charge = response.data
                     this.$refs.addchargeform.reset()
                 })
                 .catch(error => {
@@ -216,9 +241,9 @@ export default {
             if(confirm('Do you want to remove this item?')) {
                 axios.delete('/api/othercharge/' + id)
                 .then(response => {
-                    axios.get('/api/othercharges/' + this.roomdetails.billing.id).
+                    axios.get('/api/othercharges/' + this.bookingdetails.billing.id).
                     then(response => {
-                        this.roomdetails.billing.other_charge = response.data
+                        this.bookingdetails.billing.other_charge = response.data
                     })
                     .catch(error => {
                         console.log(error)
@@ -229,24 +254,43 @@ export default {
                     console.log(error)
                 })
             }
+        },
+        checkout() {
+            console.log(this.roomid)
+            console.log(this.bookingdetails.id)
+            console.log(this.roomstatus)
+            axios.patch('/api/booking/check-out/' + this.bookingdetails.id, {
+                room_id: this.roomid,
+                roomstatus: this.roomstatus
+            })
+            .then(response => {
+                alert(response.data.message)
+                this.$parent.loadRooms()
+                this.statusdialog = false
+                this.close()
+            })
+            .catch(error => {
+                console.log(error)
+            })
+            
         }
     },
     computed: {
         totalOtherCharge: function() {
             var totOCharge = 0.00
-            this.roomdetails.billing.other_charge.forEach(function(e){
+            this.bookingdetails.billing.other_charge.forEach(function(e){
                 totOCharge = parseFloat(totOCharge) + parseFloat(e.totalcost)
             })
             return parseFloat(totOCharge).toFixed(2)
         },
         totalCharges: function() {
             var totCharge = 0.00
-            totCharge = parseFloat(this.totalOtherCharge) + parseFloat(this.roomdetails.bookingcharge)
+            totCharge = parseFloat(this.totalOtherCharge) + parseFloat(this.bookingdetails.bookingcharge)
             return parseFloat(totCharge).toFixed(2)
         },
         amountDue: function() {
             var amtDue = 0.00
-            amtDue = parseFloat(this.totalCharges) - parseFloat(this.roomdetails.billing.downpayment)
+            amtDue = parseFloat(this.totalCharges) - parseFloat(this.bookingdetails.billing.downpayment)
             return parseFloat(amtDue).toFixed(2)
         }
     },
@@ -255,8 +299,8 @@ export default {
             axios.get('/api/booking-by-room/' + this.roomid)
             .then(response => {
                 console.log(response.data)
-                this.roomdetails = response.data
-                this.addcharge.billingid = this.roomdetails.billing.id
+                this.bookingdetails = response.data
+                this.addcharge.billingid = this.bookingdetails.billing.id
             })
             .catch(error => {
                 console.log(error)
