@@ -26,7 +26,7 @@
                                 </v-flex>
                             </v-layout>
                             <v-layout wrap>
-                                <v-flex xs12 sm6 md6>
+                                <v-flex v-if="this.editedIndex === -1" xs12 sm6 md6>
                                     <v-text-field 
                                         prepend-icon="person"
                                         label="First Name" 
@@ -35,7 +35,7 @@
                                         required
                                     ></v-text-field>
                                 </v-flex>
-                                <v-flex xs12 sm6 md6>
+                                <v-flex v-if="this.editedIndex === -1" xs12 sm6 md6>
                                     <v-text-field 
                                         label="Last Name" 
                                         v-model="editedItem.lastname"
@@ -115,9 +115,10 @@
             <td>{{ props.item.lastname }}</td>
             <td>{{ props.item.username }}</td>
             <td>{{ props.item.created_at }}</td>
+            <td>{{ props.item.updated_at }}</td>
             <td class="justify-center layout px-0">
             <v-btn icon class="mx-0" @click="editItem(props.item)">
-                <v-icon color="teal">edit</v-icon>
+                <v-icon color="teal">lock</v-icon>
             </v-btn>
             <v-btn icon class="mx-0" @click="deleteItem(props.item)">
                 <v-icon color="red accent-3">delete</v-icon>
@@ -143,7 +144,7 @@ export default {
         alert: false,
         alerttype: 'success',
         alertmessage: 'Success',
-        editedItem: {},
+        editedItem: { },
         firstnameRules: [
             v => !!v || 'First Name is required',
         ],
@@ -167,7 +168,8 @@ export default {
             { text: 'First Name', value: 'firstname' },
             { text: 'Last Name', value: 'lastname' },
             { text: 'Username', value: 'username' },
-            { text: 'Date Created', value: 'date_created' },
+            { text: 'Date Created', value: 'created_at' },
+            { text: 'Date Updated', value: 'updated_at' },
             { text: 'Actions', value: 'name', sortable: false }
         ],
         users: [],
@@ -178,7 +180,7 @@ export default {
     },
     computed: {
         formTitle () {
-            return this.editedIndex === -1 ? 'Register User' : 'Edit User'
+            return this.editedIndex === -1 ? 'Register User' : 'Change Password'
         }
     },
 
@@ -205,7 +207,7 @@ export default {
             })
         },
 
-        editItem (item) {
+        editItem(item) {
             this.editedIndex = this.users.indexOf(item)
             this.editedItem = Object.assign({}, item)
             this.dialog = true
@@ -227,7 +229,7 @@ export default {
             }
         },
 
-        close () {
+        close() {
             this.$refs.adduserform.reset()
             this.formvalidation = true
             this.validationerrors = ''
@@ -238,10 +240,9 @@ export default {
             }, 300)
         },
 
-        save () {
+        save() {
             if(this.$refs.adduserform.validate()) {
                 if(this.editedItem.id == undefined) {
-                    console.log(this.editedItem)
                     axios.post('/api/user', this.editedItem)
                     .then(response => {
                         //Check for backend validation errors
@@ -259,15 +260,13 @@ export default {
                     })
                 }
                 else {
-                    console.log(this.editedItem.id)
-                    console.log(this.editedItem)
                     axios.patch('/api/user/' + this.editedItem.id, this.editedItem)
                     .then(response => {
                         //Check for validation errors
                         if(response.data.message) {
                             this.close()
                             this.getUsers()
-                            this.alertmessage = response.data.message
+                            this.alertmessage = 'Password has been successfully changed.'
                             this.alerttype = 'success'
                             this.alert = true
                         }
