@@ -27,6 +27,7 @@
                                         required
                                         bottom
                                         v-model="bookingInfo.guest_id"
+                                        :rules="guestIDRules"
                                     ></v-select>
                                 </v-flex>
                                 <v-flex xs12 sm12 md6>
@@ -48,9 +49,11 @@
                                             prepend-icon="event"
                                             readonly
                                             required
+                                            :rules="departureDateRules"
                                         ></v-text-field>
                                         <v-date-picker 
-                                            v-model="bookingInfo.checkoutdate" 
+                                            v-model="bookingInfo.checkoutdate"
+                                            :min="mindate" 
                                             scrollable
                                             @change="$refs.ddate.save(bookingInfo.checkoutdate)"></v-date-picker>
                                     </v-menu>
@@ -75,6 +78,8 @@
                                             prepend-icon="access_time"
                                             readonly
                                             required
+                                            :rules="departureTimeRules"
+                                            @click="setDatePickerMinDate()"
                                         ></v-text-field>
                                         <v-time-picker 
                                             v-model="bookingInfo.checkouttime" 
@@ -89,6 +94,7 @@
                                         bottom
                                         v-model="bookingInfo.bookingtype_id"
                                         required
+                                        :rules="bookingTypeRules"
                                     ></v-select>
                                 </v-flex>
                                 <v-flex xs12 sm12 md6>
@@ -96,8 +102,9 @@
                                         prepend-icon="group"
                                         label="Number of Pax" 
                                         v-model="bookingInfo.numberofpax"
-                                        mask="#"
+                                        type="number"
                                         required
+                                        :rules="numberOfPaxRules"
                                     ></v-text-field>
                                 </v-flex>
                                 <v-flex xs12 sm12 md6>
@@ -105,7 +112,9 @@
                                         prefix="₱"
                                         label="Booking Charge" 
                                         v-model="bookingInfo.bookingcharge"
+                                        type="number"
                                         required
+                                        :rules="bookingChargeRules"
                                     ></v-text-field>
                                 </v-flex>
                                 <v-flex xs12 sm12 md6>
@@ -114,6 +123,8 @@
                                         label="Downpayment" 
                                         v-model="bookingInfo.billing.downpayment"
                                         required
+                                        type="number"
+                                        :rules="downpaymentRules"
                                     ></v-text-field>
                                 </v-flex>
                                 <v-flex xs12 sm12 md12>
@@ -147,6 +158,27 @@ export default {
     props: ['show', 'roomid'],
     data() {
         return {
+            guestIDRules: [
+                v => !!v || 'Guest name is required.'
+            ],
+            departureDateRules: [
+                v => !!v || 'Departure date is required'
+            ],
+            departureTimeRules: [
+                v => !!v || 'Departure time is required'
+            ],
+            bookingTypeRules: [
+                v => !!v || 'Booking type is required'
+            ],
+            numberOfPaxRules: [
+                v => !!v || 'Number of pax is required'
+            ],
+            bookingChargeRules: [
+                v => !!v || 'Booking charge is required'
+            ],
+            downpaymentRules: [
+                v => !!v || 'Downpayment is required'
+            ],
             formvalidation: false,
             validationerrors: '',
             guests: [],
@@ -154,11 +186,13 @@ export default {
             bookingInfo: {
                 billing: { downpayment: 0.00 } 
             },
+            mindate: ''
         }
     },
     created() {
         this.getGuestInfo()
         this.getBookingTypes()
+        this.setDatePickerMinDate()
     },
     watch: {
         roomid: function() {
@@ -197,24 +231,33 @@ export default {
             this.$emit('closedialog', false)
         },
         saveBooking() {
-            console.log(this.bookingInfo)
-            axios.post('/api/booking', this.bookingInfo)
-            .then(response => {
-                if(response.data.message) {
-                    alert(response.data.message)
-                    this.$parent.loadRooms()    
-                    this.$emit('closedialog', false)
-                }
-                else {
-                    this.formvalidation = true
-                    this.validationerrors = response.data
-                }
-                
-            })
-            .catch(error => {
-                console.log(error)
-            })
-        }
+            if(this.$refs.bookingform.validate()) {
+                console.log(this.bookingInfo)
+                axios.post('/api/booking', this.bookingInfo)
+                .then(response => {
+                    if(response.data.message) {
+                        alert(response.data.message)
+                        this.$parent.loadRooms()    
+                        this.$emit('closedialog', false)
+                    }
+                    else {
+                        this.formvalidation = true
+                        this.validationerrors = response.data
+                    }
+                    
+                })
+                .catch(error => {
+                    console.log(error.response)
+                })
+            }
+        },
+        setDatePickerMinDate() {
+            //Set minimum date for checkout
+            //cannot checkout on previous days
+            var today = new Date()
+            var mindate = new Date(today.getTime() + (24 * 60 * 60 * 1000));
+            this.mindate = mindate.toISOString().substr(0,10)
+        },
     }
 }
 </script>

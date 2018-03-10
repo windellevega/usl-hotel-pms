@@ -9,7 +9,7 @@
         <v-dialog persistent v-model="dialog" max-width="700px">
             <v-btn color="primary" dark slot="activator" class="mb-2">New Reservation</v-btn>
             <v-card>
-                <v-form>
+                <v-form ref="reservationform">
                     <v-card-title>
                         <span class="headline" py-0>{{ formTitle }}</span>
                     </v-card-title>
@@ -34,6 +34,7 @@
                                         required
                                         bottom
                                         v-model="editedItem.guest_id"
+                                        :rules="guestIDRules"
                                     ></v-select>
                                 </v-flex>
                                 <v-flex xs12 sm12 md6>
@@ -55,12 +56,12 @@
                                             prepend-icon="event"
                                             readonly
                                             required
-                                            @click="setDatePickerMinDate()"
+                                            :rules="arrivalDateRules"
                                         ></v-text-field>
                                         <v-date-picker 
                                             v-model="editedItem.checkindate" 
                                             scrollable
-                                            :min="cmindate"
+                                            :min="mindate"
                                             @change="$refs.adate.save(editedItem.checkindate);"></v-date-picker>
                                     </v-menu>
                                 </v-flex>
@@ -84,6 +85,7 @@
                                             prepend-icon="access_time"
                                             readonly
                                             required
+                                            :rules="arrivalTimeRules"
                                         ></v-text-field>
                                         <v-time-picker 
                                             v-model="editedItem.checkintime" 
@@ -109,10 +111,12 @@
                                             prepend-icon="event"
                                             readonly
                                             required
+                                            :rules="departureDateRules"
                                         ></v-text-field>
                                         <v-date-picker 
                                             v-model="editedItem.checkoutdate" 
                                             scrollable
+                                            :min="mindate"
                                             @change="$refs.ddate.save(editedItem.checkoutdate)"></v-date-picker>
                                     </v-menu>
                                 </v-flex>
@@ -136,6 +140,7 @@
                                             prepend-icon="access_time"
                                             readonly
                                             required
+                                            :rules="departureTimeRules"
                                         ></v-text-field>
                                         <v-time-picker 
                                             v-model="editedItem.checkouttime" 
@@ -152,6 +157,7 @@
                                         item-value="id"
                                         v-model="editedItem.room_id"
                                         required
+                                        :rules="roomIDRules"
                                     ></v-select>
                                 </v-flex>
                                 <v-flex xs12 sm12 md6>
@@ -162,6 +168,7 @@
                                         bottom
                                         v-model="editedItem.bookingtype_id"
                                         required
+                                        :rules="bookingTypeRules"
                                     ></v-select>
                                 </v-flex>
                                 <v-flex xs12 sm12 md6>
@@ -169,8 +176,9 @@
                                         prepend-icon="group"
                                         label="Number of Pax" 
                                         v-model="editedItem.numberofpax"
-                                        mask="#"
+                                        type="number"
                                         required
+                                        :rules="numberOfPaxRules"
                                     ></v-text-field>
                                 </v-flex>
                                 <v-flex xs12 sm12 md6>
@@ -178,7 +186,9 @@
                                         prefix="₱"
                                         label="Booking Charge" 
                                         v-model="editedItem.bookingcharge"
+                                        type="number"
                                         required
+                                        :rules="bookingChargeRules"
                                     ></v-text-field>
                                 </v-flex>
                                 <v-flex xs12 sm12 md6>
@@ -186,7 +196,9 @@
                                         prefix="₱"
                                         label="Downpayment" 
                                         v-model="editedItem.billing.downpayment"
+                                        type="number"
                                         required
+                                        :rules="downpaymentRules"
                                     ></v-text-field>
                                 </v-flex>
                                 <v-flex xs12 sm12 md12>
@@ -275,6 +287,36 @@ export default {
         alert: false,
         alerttype: 'success',
         alertmessage: '',
+        guestIDRules: [
+            v => !!v || 'Guest name is required.'
+        ],
+        arrivalDateRules: [
+             v => !!v || 'Arrival date is required'
+        ],
+        arrivalTimeRules: [
+             v => !!v || 'Arrival time is required'
+        ],
+        departureDateRules: [
+             v => !!v || 'Departure date is required'
+        ],
+        departureTimeRules: [
+             v => !!v || 'Departure time is required'
+        ],
+        roomIDRules: [
+             v => !!v || 'Room name is required'
+        ],
+        bookingTypeRules: [
+             v => !!v || 'Booking type is required'
+        ],
+        numberOfPaxRules: [
+             v => !!v || 'Number of pax is required'
+        ],
+        bookingChargeRules: [
+             v => !!v || 'Booking charge is required'
+        ],
+        downpaymentRules: [
+             v => !!v || 'Downpayment is required'
+        ],
         headers: [
             {
                 text: 'Room Name', value: 'room.room_name'
@@ -300,8 +342,7 @@ export default {
         guests: [],
         rooms: [],
         bookingtypes: [],
-        cmindate: '',
-        dmindate: ''
+        mindate: ''
     }),
     beforeCreate() {
         auth.checkAuth()
@@ -323,6 +364,7 @@ export default {
         this.getGuestInfo()
         this.getRoomInfo()
         this.getBookingTypes()
+        this.setDatePickerMinDate()
     },
 
     methods: {
@@ -410,6 +452,7 @@ export default {
             
         },
         close () {
+            this.$refs.reservationform.reset()
             this.dialog = false
             this.formvalidation = false
             setTimeout(() => {
@@ -418,50 +461,51 @@ export default {
             }, 300)
         },
         saveReservation () {
-            if(this.editedItem.id == undefined) { //If new reservation
-                axios.post('api/reservation', this.editedItem)
-                .then(response => {
-                    //Check for validation errors
-                    if(response.data.message) {
-                        this.close()
-                        this.getReservations()
-                        this.alert = true
-                        this.setAlert('success', response.data.message)
-                    }
-                    else {
-                        this.formvalidation = true
-                        this.validationerrors = response.data
-                    }
-                })
-                .catch(error => {
-                    alert(error.message)
-                })      
-            }
-            else { //If rervation detail will be updated
-                axios.patch('api/reservation/' + this.editedItem.id, this.editedItem)
-                .then(response => {
-                    if(response.data.message) {
-                        this.close()
-                        this.getReservations()
-                        this.setAlert('success', response.data.message)
-                    }
-                    else {
-                        this.formvalidation = true
-                        this.validationerrors = response.data
-                    }
-                })
-                .catch(error => {
-                    alert(error.message)
-                })
-            }
-            
+            if(this.$refs.reservationform.validate()) {
+                if(this.editedItem.id == undefined) { //If new reservation
+                    axios.post('api/reservation', this.editedItem)
+                    .then(response => {
+                        //Check for validation errors
+                        if(response.data.message) {
+                            this.close()
+                            this.getReservations()
+                            this.alert = true
+                            this.setAlert('success', response.data.message)
+                        }
+                        else {
+                            this.formvalidation = true
+                            this.validationerrors = response.data
+                        }
+                    })
+                    .catch(error => {
+                        alert(error.message)
+                    })      
+                }
+                else { //If rervation detail will be updated
+                    axios.patch('api/reservation/' + this.editedItem.id, this.editedItem)
+                    .then(response => {
+                        if(response.data.message) {
+                            this.close()
+                            this.getReservations()
+                            this.setAlert('success', response.data.message)
+                        }
+                        else {
+                            this.formvalidation = true
+                            this.validationerrors = response.data
+                        }
+                    })
+                    .catch(error => {
+                        alert(error.message)
+                    })
+                }
+            }  
         },
         setDatePickerMinDate() {
             //Set minimum date for reservation
             //cannot reserve current date
             var today = new Date()
-            var cmindate = new Date(today.getTime() + (24 * 60 * 60 * 1000));
-            this.cmindate = cmindate.toISOString().substr(0,10)
+            var mindate = new Date(today.getTime() + (48 * 60 * 60 * 1000));
+            this.mindate = mindate.toISOString().substr(0,10)
         },
         setAlert(type, message) {
             this.alert = true
