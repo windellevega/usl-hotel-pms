@@ -51,7 +51,7 @@
     import auth from './auth'
 
     //Initialize global headers for axios
-    axios.defaults.baseURL = 'http://localhost:8000'
+    axios.defaults.baseURL = 'http://192.168.100.8/usl-hotel-pms-api/public'
     axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
     axios.defaults.headers.common['Accept'] = 'application/json'
     

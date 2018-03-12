@@ -87,6 +87,7 @@
                                                                     label="Guest Type" 
                                                                     v-model="guesttype"
                                                                     required
+                                                                    :rules="guestTypeRules"
                                                                 ></v-text-field>
                                                             </v-flex>
                                                             <v-flex xs12 sm3 md3 px-2 small>
@@ -112,6 +113,7 @@
                                                                     label="Company Name" 
                                                                     v-model="company.companyname"
                                                                     required
+                                                                    :rules="companyNameRules"
                                                                 ></v-text-field>
                                                             </v-flex>
                                                             <v-flex xs12 sm10 md10 offset-sm1 offset-md1 px-2>
@@ -119,6 +121,7 @@
                                                                     label="Company Address" 
                                                                     v-model="company.companyaddress"
                                                                     required
+                                                                    :rules="companyAddressRules"
                                                                 ></v-text-field>
                                                             </v-flex>
                                                             <v-flex offset-sm8 offset-md8 xs12 sm3 md3 px-2 small>
@@ -202,6 +205,9 @@ export default {
         companyNameRules: [
             v => !!v || 'Company name is required.'
         ],
+        companyAddressRules: [
+            v => !!v || 'Company address is required.'
+        ],
         headers: [
             { text: 'Guest Name', value: 'fullname' },
             { text: 'Guest Type', value: 'guest_type.guesttype' },
@@ -276,26 +282,30 @@ export default {
             })
         },
         addGuestType() {
-            axios.post('/api/guesttype', { guesttype: this.guesttype })
-            .then(response => {
-                alert(response.data.message)
-                this.getGuestTypes()
-                this.$refs.addguesttypeform.reset()
-            })
-            .catch(error => {
-                console.log(error)
-            })
+            if(this.$refs.addguesttypeform.validate()) {
+                axios.post('/api/guesttype', { guesttype: this.guesttype })
+                .then(response => {
+                    alert(response.data.message)
+                    this.getGuestTypes()
+                    this.$refs.addguesttypeform.reset()
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+            }
         },
         addCompany() {
-            axios.post('/api/company', this.company)
-            .then(response => {
-                alert(response.data.message)
-                this.getCompanies()
-                this.$refs.addcompanyform.reset()
-            })
-            .catch(error => {
-                console.log(error)
-            })
+            if(this.$refs.addcompanyform.validate()) {
+                axios.post('/api/company', this.company)
+                .then(response => {
+                    alert(response.data.message)
+                    this.getCompanies()
+                    this.$refs.addcompanyform.reset()
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+            }
         },
         editItem (item) {
             this.editedIndex = this.guests.indexOf(item)

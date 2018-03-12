@@ -13,7 +13,7 @@
                     <span class="headline">{{ formTitle }}</span>
                 </v-card-title>
                 <v-card-text>
-                    <v-form ref="adduserform">
+                    <v-form ref="userform">
                         <v-container grid-list-md>
                             <v-layout v-if="formvalidation" wrap>
                                 <v-flex py-0 fill-height xs12 sm6 md6 v-for="(error,i) in validationerrors" :key="i">
@@ -69,7 +69,18 @@
                                         required
                                     ></v-text-field>
                                 </v-flex>
-                                <v-flex xs12 sm12 md12>
+                                <v-flex v-if="this.editedIndex !== -1" xs12 sm12 md12>
+                                    <v-text-field 
+                                        prepend-icon="vpn_key"
+                                        label="New Password"
+                                        id="password"
+                                        v-model="editedItem.password"
+                                        :rules="passwordRules"
+                                        type="password"
+                                        required
+                                    ></v-text-field>
+                                </v-flex>
+                                <v-flex v-else xs12 sm12 md12>
                                     <v-text-field 
                                         prepend-icon="vpn_key"
                                         label="Password" 
@@ -110,24 +121,24 @@
         hide-actions
         class="elevation-1"
         >
-        <template slot="items" slot-scope="props">
-            <td>{{ props.item.firstname }}</td>
-            <td>{{ props.item.lastname }}</td>
-            <td>{{ props.item.username }}</td>
-            <td>{{ props.item.created_at }}</td>
-            <td>{{ props.item.updated_at }}</td>
-            <td class="justify-center layout px-0">
-            <v-btn icon class="mx-0" @click="editItem(props.item)">
-                <v-icon color="teal">lock</v-icon>
-            </v-btn>
-            <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                <v-icon color="red accent-3">delete</v-icon>
-            </v-btn>
-            </td>
-        </template>
-        <template slot="no-data">
-            <td colspan="5" class="text-xs-center">There are no users to show.</td>
-        </template>
+            <template slot="items" slot-scope="props">
+                <td>{{ props.item.firstname }}</td>
+                <td>{{ props.item.lastname }}</td>
+                <td>{{ props.item.username }}</td>
+                <td>{{ props.item.created_at }}</td>
+                <td>{{ props.item.updated_at }}</td>
+                <td class="justify-center layout px-0">
+                <v-btn icon class="mx-0" @click="editItem(props.item)">
+                    <v-icon color="teal">lock</v-icon>
+                </v-btn>
+                <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+                    <v-icon color="red accent-3">delete</v-icon>
+                </v-btn>
+                </td>
+            </template>
+            <template slot="no-data">
+                <td colspan="5" class="text-xs-center">There are no users to show.</td>
+            </template>
         </v-data-table>
     </div>
 </template>
@@ -230,7 +241,7 @@ export default {
         },
 
         close() {
-            this.$refs.adduserform.reset()
+            this.$refs.userform.reset()
             this.formvalidation = true
             this.validationerrors = ''
             this.dialog = false
@@ -241,7 +252,7 @@ export default {
         },
 
         save() {
-            if(this.$refs.adduserform.validate()) {
+            if(this.$refs.userform.validate()) {
                 if(this.editedItem.id == undefined) {
                     axios.post('/api/user', this.editedItem)
                     .then(response => {
@@ -264,6 +275,7 @@ export default {
                     .then(response => {
                         //Check for validation errors
                         if(response.data.message) {
+                            console.log(response.data)
                             this.close()
                             this.getUsers()
                             this.alertmessage = 'Password has been successfully changed.'

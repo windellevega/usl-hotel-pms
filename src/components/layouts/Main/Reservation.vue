@@ -231,7 +231,7 @@
         class="elevation-1"
         >
             <template slot="items" slot-scope="props">
-                <tr v-if="compareDate(props.item.checkindate)" style="background:#FFD180">
+                <tr v-if="compareDate(props.item.checkindate) == 1" style="background:#FFD180">
                     <td class="text-xs-center">{{ props.item.room.room_name }}</td>
                     <td class="text-xs-left">{{ props.item.guest.fullname }} ({{ props.item.guest.guest_type.guesttype }}) - {{ props.item.guest.company.companyname }}</td>
                     <td class="text-xs-left">{{ props.item.booking_type.bookingtype }}</td>
@@ -239,6 +239,26 @@
                     <td class="text-xs-left">{{ props.item.checkin }}</td>
                     <td class="text-xs-left">{{ props.item.checkout }}</td>
                     <td class="text-xs-left">₱ {{ props.item.bookingcharge }}</td>
+                    <td class="text-xs-left">₱ {{ props.item.billing.downpayment }}</td>
+                    <td class="text-xs-left">{{ props.item.stayduration_days }}</td>
+                    <td class="justify-center layout px-0">
+                    <v-btn icon class="mx-0" @click="editItem(props.item)">
+                        <v-icon color="teal">edit</v-icon>
+                    </v-btn>
+                    <v-btn icon class="mx-0" @click="deleteItem(props.item)">
+                        <v-icon color="red accent-3">delete</v-icon>
+                    </v-btn>
+                    </td>
+                </tr>
+                <tr v-else-if="compareDate(props.item.checkindate) == -1" style="background:#FF8A80">
+                    <td class="text-xs-center">{{ props.item.room.room_name }}</td>
+                    <td class="text-xs-left">{{ props.item.guest.fullname }} ({{ props.item.guest.guest_type.guesttype }}) - {{ props.item.guest.company.companyname }}</td>
+                    <td class="text-xs-left">{{ props.item.booking_type.bookingtype }}</td>
+                    <td class="text-xs-left">{{ props.item.numberofpax }}</td>
+                    <td class="text-xs-left">{{ props.item.checkin }}</td>
+                    <td class="text-xs-left">{{ props.item.checkout }}</td>
+                    <td class="text-xs-left">₱ {{ props.item.bookingcharge }}</td>
+                    <td class="text-xs-left">₱ {{ props.item.billing.downpayment }}</td>
                     <td class="text-xs-left">{{ props.item.stayduration_days }}</td>
                     <td class="justify-center layout px-0">
                     <v-btn icon class="mx-0" @click="editItem(props.item)">
@@ -257,6 +277,7 @@
                     <td class="text-xs-left">{{ props.item.checkin }}</td>
                     <td class="text-xs-left">{{ props.item.checkout }}</td>
                     <td class="text-xs-left">₱ {{ props.item.bookingcharge }}</td>
+                    <td class="text-xs-left">₱ {{ props.item.billing.downpayment }}</td>
                     <td class="text-xs-left">{{ props.item.stayduration_days }}</td>
                     <td class="justify-center layout px-0">
                     <v-btn icon class="mx-0" @click="editItem(props.item)">
@@ -269,7 +290,7 @@
                 </tr>
             </template>
             <template slot="no-data">
-                <td colspan="7" class="text-xs-center">There are no reservations to show.</td>
+                <td colspan="10" class="text-xs-center">There are no reservations to show.</td>
             </template>
         </v-data-table>
     </div>
@@ -327,6 +348,7 @@ export default {
             { text: 'Check-In', value: 'checkin' },
             { text: 'Check-Out', value: 'checkout' },
             { text: 'Booking Charge', value: 'bookingcharge' },
+            { text: 'Downpayment', value: 'billing.downpayment' },
             { text: 'Duration', value: 'stayduration_days' },
             { text: 'Actions', value: 'name', sortable: false }
         ],
@@ -369,17 +391,22 @@ export default {
 
     methods: {
         compareDate(date) {
+
             let currTime = new Date()
-            currTime = currTime.getMonth() + '-' + currTime.getDate() + '-' + currTime.getFullYear()
-
             let refTime = new Date(date)
-            refTime = refTime.getMonth() + '-' + refTime.getDate() + '-' + refTime.getFullYear()
 
-            if(currTime === refTime) {
-                return true
+            if(currTime.getMonth() + '-' + currTime.getDay() + '-' + currTime.getFullYear() === refTime.getMonth() + '-' + refTime.getDay() + '-' + refTime.getFullYear()) {
+                return 1
+            }
+
+            currTime = new Date().getTime()
+            refTime = new Date(date).getTime()
+
+            if(currTime > refTime) {
+                return -1
             }
             else {
-                return false
+                return 0
             }
         },
         getReservations() {
@@ -504,7 +531,7 @@ export default {
             //Set minimum date for reservation
             //cannot reserve current date
             var today = new Date()
-            var mindate = new Date(today.getTime() + (48 * 60 * 60 * 1000));
+            var mindate = new Date(today.getTime() + (24 * 60 * 60 * 1000));
             this.mindate = mindate.toISOString().substr(0,10)
         },
         setAlert(type, message) {

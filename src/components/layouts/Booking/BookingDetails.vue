@@ -96,26 +96,63 @@
                                                         <v-text-field 
                                                             label="Description" 
                                                             v-model="addcharge.othercharge_info"
+                                                            :rules="otherChargeInfoRules"
                                                             required
+                                                            :disabled="disabled"
                                                         ></v-text-field>
                                                     </v-flex>
                                                     <v-flex xs12 sm3 md3 px-2>
                                                         <v-text-field 
                                                             label="Cost" 
                                                             prefix="₱"
+                                                            type="number"
                                                             v-model="addcharge.cost"
+                                                            :rules="costRules"
                                                             required
+                                                            :disabled="disabled"
                                                         ></v-text-field>
                                                     </v-flex>
                                                     <v-flex xs12 sm2 md2 px-2>
                                                         <v-text-field 
                                                             label="Qty" 
+                                                            type="number"
                                                             v-model="addcharge.quantity"
+                                                            :rules="quantityRules"
                                                             required
+                                                            :disabled="disabled"
                                                         ></v-text-field>
                                                     </v-flex>
                                                     <v-flex xs12 sm3 md3 px-2 small>
                                                         <v-btn @click="addOtherCharge" color="primary">Add</v-btn>
+                                                    </v-flex>
+                                                </v-layout>
+                                            </v-form>
+                                        </v-card-text>
+                                    </v-card>
+                                </v-expansion-panel-content>
+                            </v-expansion-panel>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12 py-1>
+                            <v-expansion-panel popout>
+                                <v-expansion-panel-content hide-actions>
+                                    <div slot="header" class=".body-1"><v-icon color="green darken-1">autorenew</v-icon> <strong>Modify Booking Charge</strong></div>
+                                    <v-card>
+                                        <v-card-text>
+                                            <v-form ref="bookingchargeform">
+                                                <v-layout row>
+                                                    <v-flex xs12 offset-sm1 offset-md1 sm7 md7 px-2>
+                                                        <v-text-field 
+                                                            label="Cost" 
+                                                            prefix="₱"
+                                                            type="number"
+                                                            v-model="bookingdetails.bookingcharge"
+                                                            :rules="bookingChargeRules"
+                                                            required
+                                                            :disabled="disabled"
+                                                        ></v-text-field>
+                                                    </v-flex>
+                                                    <v-flex xs12 sm3 md3 px-2 small>
+                                                        <v-btn @click="modifyBookingCharge" color="primary">Update</v-btn>
                                                     </v-flex>
                                                 </v-layout>
                                             </v-form>
@@ -129,7 +166,7 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" flat="flat" @click.native="close()">Close</v-btn>
-                    <v-btn color="blue darken-1" flat="flat" @click.stop="statusdialog = true">Check-out</v-btn>
+                    <v-btn color="blue darken-1" flat="flat" @click.stop="statusdialog = true" >Check-out</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -161,8 +198,21 @@ export default {
     name: 'booking-details',
     props: ['show', 'roomid'],
     data: () => ({
+        disabled: true,
         statusdialog: false,
         roomstatus: 2,
+        otherChargeInfoRules: [
+            v => !!v || 'Description is required.'
+        ],
+        costRules: [
+            v => !!v || 'Cost is required.'
+        ],
+        quantityRules: [
+            v => !!v || 'Quantity is required.'
+        ],
+        bookingChargeRules: [
+            v => !!v || 'Booking charge is required.'
+        ],
         roomstatuses: [
             { value: 1, text: 'VR - Vacant Ready'},
             { value: 2, text: 'VC - Vacant Clean'},
@@ -219,23 +269,26 @@ export default {
     }),
     methods: {
         close() {
+            this.disabled = true
             this.$emit('closedialog', false)
         },
         addOtherCharge() {
-            axios.post('/api/othercharge', this.addcharge)
-            .then(response => {
-                axios.get('/api/othercharges/' + this.bookingdetails.billing.id).
-                then(response => {
-                    this.bookingdetails.billing.other_charge = response.data
-                    this.$refs.addchargeform.reset()
+            if(this.$refs.addchargeform.validate()) {
+                axios.post('/api/othercharge', this.addcharge)
+                .then(response => {
+                    axios.get('/api/othercharges/' + this.bookingdetails.billing.id).
+                    then(response => {
+                        this.bookingdetails.billing.other_charge = response.data
+                        this.$refs.addchargeform.reset()
+                    })
+                    .catch(error => {
+                        console.log(error)
+                    })
                 })
                 .catch(error => {
                     console.log(error)
                 })
-            })
-            .catch(error => {
-                console.log(error)
-            })
+            }
         },
         removeOtherCharge(id) {
             if(confirm('Do you want to remove this item?')) {
@@ -272,7 +325,19 @@ export default {
             .catch(error => {
                 console.log(error)
             })
-            
+        },
+        modifyBookingCharge() {
+            if(this.$refs.bookingchargeform.validate()) {
+                axios.patch('/api/booking/bookingcharge/' + this.bookingdetails.id, {
+                    bookingcharge: this.bookingdetails.bookingcharge
+                })
+                .then(response => {
+                    alert(response.data.message)
+                })
+                .catch(error => {
+                    console.log(error)
+                })
+            }
         }
     },
     computed: {
@@ -301,6 +366,7 @@ export default {
                 console.log(response.data)
                 this.bookingdetails = response.data
                 this.addcharge.billingid = this.bookingdetails.billing.id
+                this.disabled = false
             })
             .catch(error => {
                 console.log(error)
