@@ -120,7 +120,6 @@ export default {
         getRooms () {
             axios.get('/api/rooms')
             .then(response => {
-                console.log(response.data)
                 this.rooms = response.data
             })
             .catch(error => {

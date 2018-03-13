@@ -9,71 +9,74 @@
         <v-dialog v-model="dialog" max-width="600px">
             <v-btn color="primary" dark slot="activator" class="mb-2">New Guest</v-btn>
             <v-card>
-                <v-form ref="guestform">
                     <v-card-title>
                         <span class="headline">{{ formTitle }}</span>
                     </v-card-title>
                     <v-card-text>
                         <v-container grid-list-md>
-                            <v-layout v-if="formvalidation" wrap>
-                                <v-flex py-0 fill-height xs12 sm6 md6 v-for="(error,i) in validationerrors" :key="i">
-                                    <p py-0
-                                        style="color:#FF1744"
-                                        class="caption font-weight 400" 
-                                        >
-                                        *{{ error }}
-                                    </p>
-                                </v-flex>
-                            </v-layout>
+                            <v-form ref="guestform">
+                                <v-layout v-if="formvalidation" wrap>
+                                    <v-flex py-0 fill-height xs12 sm6 md6 v-for="(error,i) in validationerrors" :key="i">
+                                        <p py-0
+                                            style="color:#FF1744"
+                                            class="caption font-weight 400" 
+                                            >
+                                            *{{ error }}
+                                        </p>
+                                    </v-flex>
+                                </v-layout>
+                                <v-layout wrap>
+                                    <v-flex xs12 sm6 md6>
+                                        <v-text-field 
+                                            prepend-icon="person"
+                                            label="First Name" 
+                                            v-model="editedItem.firstname"
+                                            required
+                                            :rules="firtnameRules"
+                                        ></v-text-field>
+                                    </v-flex>
+                                    <v-flex xs12 sm6 md6>
+                                        <v-text-field 
+                                            label="Last Name" 
+                                            v-model="editedItem.lastname"
+                                            required
+                                            :rules="lastnameRules"
+                                        ></v-text-field>
+                                    </v-flex>
+                                    <v-flex xs12 sm6 md6>
+                                        <v-select
+                                            prepend-icon="group"
+                                            :items="guesttypes"
+                                            label="Guest Type"
+                                            required
+                                            bottom
+                                            v-model="editedItem.guesttype_id"
+                                            :rules="guestTypeRules"
+                                        ></v-select>
+                                    </v-flex>
+                                    <v-flex xs12 sm6 md6>
+                                        <v-text-field 
+                                            prepend-icon="phone"
+                                            label="Contact Number" 
+                                            v-model="editedItem.contactno"
+                                            required
+                                            :rules="contactNumberRules"
+                                        ></v-text-field>
+                                    </v-flex>
+                                    <v-flex xs12 sm12 md12>
+                                        <v-select
+                                            prepend-icon="business"
+                                            :items="companies"
+                                            label="Company Name"
+                                            required
+                                            bottom
+                                            v-model="editedItem.company_id"
+                                            :rules="companyNameRules"
+                                        ></v-select>
+                                    </v-flex>
+                                </v-layout>
+                            </v-form>
                             <v-layout wrap>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field 
-                                        prepend-icon="person"
-                                        label="First Name" 
-                                        v-model="editedItem.firstname"
-                                        required
-                                        :rules="firtnameRules"
-                                    ></v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field 
-                                        label="Last Name" 
-                                        v-model="editedItem.lastname"
-                                        required
-                                        :rules="lastnameRules"
-                                    ></v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-select
-                                        prepend-icon="group"
-                                        :items="guesttypes"
-                                        label="Guest Type"
-                                        required
-                                        bottom
-                                        v-model="editedItem.guesttype_id"
-                                        :rules="guestTypeRules"
-                                    ></v-select>
-                                </v-flex>
-                                <v-flex xs12 sm6 md6>
-                                    <v-text-field 
-                                        prepend-icon="phone"
-                                        label="Contact Number" 
-                                        v-model="editedItem.contactno"
-                                        required
-                                        :rules="contactNumberRules"
-                                    ></v-text-field>
-                                </v-flex>
-                                <v-flex xs12 sm12 md12>
-                                    <v-select
-                                        prepend-icon="business"
-                                        :items="companies"
-                                        label="Company Name"
-                                        required
-                                        bottom
-                                        v-model="editedItem.company_id"
-                                        :rules="companyNameRules"
-                                    ></v-select>
-                                </v-flex>
                                 <v-flex xs12 sm12 md12 py-1>
                                     <v-expansion-panel popout>
                                         <v-expansion-panel-content hide-actions>
@@ -142,7 +145,6 @@
                         <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
                         <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
                     </v-card-actions>
-                </v-form>
             </v-card>
         </v-dialog>
         <v-alert :type="alerttype" dismissible v-model="alert" transition="slide-y-transition">
