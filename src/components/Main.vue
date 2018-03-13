@@ -26,7 +26,7 @@
                 <v-btn icon large>
                     <img height="45px;" src="../../static/logo.png">
                 </v-btn>
-                <span class="hidden-xs-only"><strong>Tjolle Hotel</strong> PMS</span>
+                <span class="hidden-xs-only"><strong>Tjolle International Hotel</strong> PMS</span>
             </v-toolbar-title>
         </v-toolbar>
 
