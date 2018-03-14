@@ -214,8 +214,6 @@ export default {
             v => !!v || 'Booking charge is required.'
         ],
         roomstatuses: [
-            { value: 1, text: 'VR - Vacant Ready'},
-            { value: 2, text: 'VC - Vacant Clean'},
             { value: 3, text: 'VD - Vacant Dirty'},
             { value: 6, text: 'OOO - Out of Order'}
         ],
@@ -271,6 +269,15 @@ export default {
         close() {
             this.disabled = true
             this.$emit('closedialog', false)
+        },
+        generateInvoice() {
+            axios.get('/api/invoice')
+            .then(response => {
+                return response
+            })
+            .then(error => {
+                console.log(error)
+            })
         },
         addOtherCharge() {
             if(this.$refs.addchargeform.validate()) {

@@ -1,7 +1,7 @@
 import axios from 'axios'
 import router from '@/router'
 
-const API_URL = 'http://192.168.0.18'
+const API_URL = 'http://localhost:8000'
 const LOGIN_URL = API_URL + '/oauth/token'
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
