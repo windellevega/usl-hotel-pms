@@ -232,7 +232,6 @@ export default {
         },
         saveBooking() {
             if(this.$refs.bookingform.validate()) {
-                console.log(this.bookingInfo)
                 axios.post('/api/booking', this.bookingInfo)
                 .then(response => {
                     if(response.data.message) {

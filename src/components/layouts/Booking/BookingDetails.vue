@@ -11,11 +11,14 @@
                         <v-flex xs12 sm12 py-1>  
                             <strong>GUEST: </strong>{{ bookingdetails.guest.fullname }} ({{ bookingdetails.guest.guest_type.guesttype }}) - {{ bookingdetails.guest.company.companyname }}
                         </v-flex>
-                        <v-flex xs12 sm6 md6 py-1>  
-                            <strong>CHECK-IN: </strong>{{ bookingdetails.checkin }}
+                        <v-flex xs12 sm12 md12 py-1>  
+                            <strong>EXPECTED CHECK-IN: </strong>{{ bookingdetails.checkin }}
                         </v-flex>
-                        <v-flex xs12 sm6 md6 py-1>  
-                            <strong>CHECK-OUT: </strong>{{ bookingdetails.checkout }}
+                        <v-flex xs12 sm12 md12 py-1>  
+                            <strong>ACTUAL CHECK-IN: </strong>{{ bookingdetails.actual_checkin }}
+                        </v-flex>
+                        <v-flex xs12 sm12 md12 py-1>  
+                            <strong>EXPECTED CHECK-OUT: </strong> <span :style="'color:' + checkoutstatcolor">{{ bookingdetails.checkout }}</span>
                         </v-flex>
                         <v-flex xs12 sm6 md6 py-1>  
                             <strong>NO. OF PAX: </strong>{{ bookingdetails.numberofpax }}
@@ -166,7 +169,7 @@
                 <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="blue darken-1" flat="flat" @click.native="close()">Close</v-btn>
-                    <v-btn color="blue darken-1" flat="flat" @click.stop="statusdialog = true" >Check-out</v-btn>
+                    <v-btn color="blue darken-1" flat="flat" @click.stop="beforeCheckout()" >Check-out</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -198,6 +201,8 @@ export default {
     name: 'booking-details',
     props: ['show', 'roomid'],
     data: () => ({
+        checkoutstatcolor: '#4CAF50',
+        checkoutstatus: 1,
         disabled: true,
         statusdialog: false,
         roomstatus: 2,
@@ -266,6 +271,25 @@ export default {
         }
     }),
     methods: {
+        getCheckOutStatus() {
+            //get the timestamp (number of milliseconds since 01-01-1970)
+            let currTime = new Date().getTime()
+            let refTime = new Date(this.bookingdetails.checkoutdate + ' ' + this.bookingdetails.checkouttime).getTime()
+
+            let timeDiff = currTime - refTime
+
+            if(timeDiff > -3600000 && timeDiff < 3600000) {
+                this.checkoutstatus = 1
+            }
+            else if(timeDiff < -3600000) {
+                this.checkoutstatcolor = '#E65100'
+                this.checkoutstatus = -1
+            }
+            else {
+                this.checkoutstatcolor = '#E5143D'
+                this.checkoutstatus = 0
+            }
+        },
         close() {
             this.disabled = true
             this.$emit('closedialog', false)
@@ -308,17 +332,28 @@ export default {
                     .catch(error => {
                         console.log(error)
                     })
-                    console.log(response.data.message)
                 })
                 .catch(error => {
                     console.log(error)
                 })
             }
         },
+        beforeCheckout() {
+            if(this.checkoutstatus === -1) {
+                if(confirm('You are about to check-out customer before the expected date/time. By proceeding, it is considered that all booking charges are correct.')) {
+                    this.statusdialog = true
+                }
+            }
+            else if(this.checkoutstatus == 0) {
+                if(confirm('You are about to check-out customer after the expected date/time. By proceeding, it is considered that all booking charges are correct.')) {
+                    this.statusdialog = true
+                }
+            }
+            else {
+                this.statusdialog = true
+            }
+        },
         checkout() {
-            console.log(this.roomid)
-            console.log(this.bookingdetails.id)
-            console.log(this.roomstatus)
             axios.patch('/api/booking/check-out/' + this.bookingdetails.id, {
                 room_id: this.roomid,
                 roomstatus: this.roomstatus
@@ -370,10 +405,10 @@ export default {
         roomid: function() {
             axios.get('/api/booking-by-room/' + this.roomid)
             .then(response => {
-                console.log(response.data)
                 this.bookingdetails = response.data
                 this.addcharge.billingid = this.bookingdetails.billing.id
                 this.disabled = false
+                this.getCheckOutStatus()
             })
             .catch(error => {
                 console.log(error)

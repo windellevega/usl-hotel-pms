@@ -1,5 +1,15 @@
 <template>
     <v-list dense>
+        <v-list-tile avatar>
+            <v-list-tile-avatar color="blue-grey lighten-4">
+                <v-icon>person_outline</v-icon>
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+                <v-list-tile-title>{{ user.firstname }} {{ user.lastname }}</v-list-tile-title>
+                <v-list-tile-sub-title>{{ user.usertype }}</v-list-tile-sub-title>
+            </v-list-tile-content>
+        </v-list-tile>
+        <v-divider></v-divider>
         <template v-for="item in items">
             <v-layout
                 row
@@ -71,6 +81,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
     name: 'app-nav-list',
     data() {
@@ -91,17 +103,23 @@ export default {
                     ]
                 },
                 { icon: 'fa-sign-out', text: 'Sign Out', route: '/login', active: false }
-            ]
+            ],
+            user: {
+                firstname: '',
+                lastname: '',
+                usertype: ''
+            }
         }
     },
     props: {
         source: String
     },
     created() {
-        this.today = new Date();
-        var dd = this.today.getDate();
-        var mm = this.today.getMonth()+1; //January is 0!
-        var yyyy = this.today.getFullYear();
+        this.getUserInformation()
+        this.today = new Date()
+        var dd = this.today.getDate()
+        var mm = this.today.getMonth()+1 //January is 0!
+        var yyyy = this.today.getFullYear()
 
         if(dd<10) {
             dd = '0'+dd
@@ -112,6 +130,24 @@ export default {
         } 
 
         this.today = yyyy + '-' + mm + '-' + dd
+    },
+    methods: {
+        getUserInformation() {
+            axios.get('/api/user')
+            .then(response => {
+                this.user.firstname = response.data.firstname
+                this.user.lastname = response.data.lastname
+                if(response.data.user_type === 1) {
+                    this.user.usertype = 'Administrator'
+                }
+                else {
+                    this.user.usertype = 'User'
+                }
+            })
+            .catch(error => {
+                console.log(error)
+            })
+        }
     }
 }
 </script>

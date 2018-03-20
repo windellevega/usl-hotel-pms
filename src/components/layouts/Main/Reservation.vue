@@ -394,11 +394,11 @@ export default {
 
             let currTime = new Date()
             let refTime = new Date(date)
-
-            if(currTime.getMonth() + '-' + currTime.getDay() + '-' + currTime.getFullYear() === refTime.getMonth() + '-' + refTime.getDay() + '-' + refTime.getFullYear()) {
+            if(currTime.getMonth() + '-' + currTime.getDate() + '-' + currTime.getFullYear() === refTime.getMonth() + '-' + refTime.getDate() + '-' + refTime.getFullYear()) {
                 return 1
             }
 
+            //get the timestamp (number of milliseconds since 01-01-1970)
             currTime = new Date().getTime()
             refTime = new Date(date).getTime()
 

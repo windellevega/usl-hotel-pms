@@ -69,8 +69,8 @@
             error: '',
             credentials: {
                 grant_type: 'password',
-                client_id: 4,
-                client_secret: 'Me9Wbd6ETyQf38kiJFLvfaHgVW7ZjtAvJd945tQY',
+                client_id: 2,
+                client_secret: '1OSdcmpVhF99PDLx7bjwrKbM2ix1siRBolZD5rFw',
                 username: '',
                 password: '',
                 scope: '*'

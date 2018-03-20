@@ -60,7 +60,6 @@
                                             label="Contact Number" 
                                             v-model="editedItem.contactno"
                                             required
-                                            :rules="contactNumberRules"
                                         ></v-text-field>
                                     </v-flex>
                                     <v-flex xs12 sm12 md12>
@@ -200,9 +199,6 @@ export default {
         ],
         guestTypeRules: [
             v => !!v || 'Guest type is required.'
-        ],
-        contactNumberRules: [
-            v => /^(09|\+639)\d{9}$/.test(v) || 'Contact number is not valid'
         ],
         companyNameRules: [
             v => !!v || 'Company name is required.'

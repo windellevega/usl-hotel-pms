@@ -9,7 +9,7 @@
         <v-container grid-list-md>
             
             <v-layout row wrap transition="slide-y-transition">
-                <v-flex xs4 sm4 v-for="(room, i) in rooms" :key="i">
+                <v-flex xs12 sm6 md4 v-for="(room, i) in rooms" :key="i">
                     <v-card fluid hover>
                         <v-card-title 
                             v-if="room.status_history[0].status_id === 4 

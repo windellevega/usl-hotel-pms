@@ -51,7 +51,7 @@
     import auth from './auth'
 
     //Initialize global headers for axios
-    axios.defaults.baseURL = 'http://localhost:8000'
+    axios.defaults.baseURL = process.env.API_BASE_URL
     axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded'
     axios.defaults.headers.common['Accept'] = 'application/json'
     
