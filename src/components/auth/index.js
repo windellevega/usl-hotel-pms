@@ -43,6 +43,7 @@ export default {
         currTime = currTime.getTime()
 
         if(currTime < localStorage.getItem('expires_at')) {
+            return 1
         }
         else {
             alert('You are not logged in! Please login to continue.')

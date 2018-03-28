@@ -291,7 +291,6 @@ export default {
             }
         },
         close() {
-            this.disabled = true
             this.$emit('closedialog', false)
         },
         generateInvoice() {
@@ -367,6 +366,7 @@ export default {
             .catch(error => {
                 console.log(error)
             })
+            window.open('http://localhost:8000/api/invoice', '_blank');
         },
         modifyBookingCharge() {
             if(this.$refs.bookingchargeform.validate()) {
