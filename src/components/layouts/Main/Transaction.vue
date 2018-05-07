@@ -2,16 +2,16 @@
     <div>
         <v-layout>
             <v-flex xs12 sm12>
-                <h2 class="display-1">HOTEL RESERVATIONS</h2>
+                <h2 class="display-1">HOTEL TRANSACTIONS</h2>
                 <br>
             </v-flex>
         </v-layout>
         <v-dialog persistent v-model="dialog" max-width="700px">
-            <v-btn color="primary" dark slot="activator" class="mb-2">New Reservation</v-btn>
+            <v-btn color="primary" dark slot="activator" class="mb-2">Record Transaction</v-btn>
             <v-card>
                 <v-form ref="reservationform">
                     <v-card-title>
-                        <span class="headline" py-0>{{ formTitle }}</span>
+                        <span class="headline" py-0>Record Transaction</span>
                     </v-card-title>
                     <v-card-text>
                         <v-container grid-list-md>
@@ -61,7 +61,6 @@
                                         <v-date-picker 
                                             v-model="editedItem.checkindate" 
                                             scrollable
-                                            :min="mindate"
                                             @change="$refs.adate.save(editedItem.checkindate);"></v-date-picker>
                                     </v-menu>
                                 </v-flex>
@@ -116,7 +115,6 @@
                                         <v-date-picker 
                                             v-model="editedItem.checkoutdate" 
                                             scrollable
-                                            :min="mindate"
                                             @change="$refs.ddate.save(editedItem.checkoutdate)"></v-date-picker>
                                     </v-menu>
                                 </v-flex>
@@ -147,7 +145,34 @@
                                             @change="$refs.dtime.save(editedItem.checkouttime)"></v-time-picker>
                                     </v-menu>
                                 </v-flex>
-                                <v-flex xs12 sm12 md12>
+                                <v-flex xs12 sm12 md6>
+                                    <v-menu
+                                        ref="rdate"
+                                        lazy
+                                        :close-on-content-click="true"
+                                        transition="scale-transition"
+                                        offset-y
+                                        full-width
+                                        :nudge-right="35"
+                                        min-width="290px"
+                                        :return-value.sync="editedItem.reservationdate"
+                                    >
+                                        <v-text-field
+                                            slot="activator"
+                                            label="Reservation Date"
+                                            v-model="editedItem.reservationdate"
+                                            prepend-icon="event"
+                                            readonly
+                                            required
+                                            :rules="departureDateRules"
+                                        ></v-text-field>
+                                        <v-date-picker 
+                                            v-model="editedItem.reservationdate" 
+                                            scrollable
+                                            @change="$refs.rdate.save(editedItem.reservationdate)"></v-date-picker>
+                                    </v-menu>
+                                </v-flex>
+                                <v-flex xs12 sm12 md6>
                                     <v-select
                                         prepend-icon="style"
                                         :items="rooms"
@@ -202,12 +227,19 @@
                                         :rules="downpaymentRules"
                                     ></v-text-field>
                                 </v-flex>
+                                <v-flex xs12 sm12 md6>
+                                    <v-text-field 
+                                        prefix="₱"
+                                        label="Total Charges" 
+                                        v-model="editedItem.billing.totalcharges"
+                                        type="number"
+                                        required
+                                    ></v-text-field>
+                                </v-flex>
                                 <v-flex xs12 sm12 md12>
                                     <v-text-field 
                                         label="Remarks" 
                                         v-model="editedItem.remarks"
-                                        multi-line
-                                        no-resize
                                     ></v-text-field>
                                 </v-flex>
                             </v-layout>
@@ -216,7 +248,7 @@
                     <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
-                        <v-btn color="blue darken-1" flat @click.native="saveReservation">Save</v-btn>
+                        <v-btn color="blue darken-1" flat @click.native="saveTransaction">Save</v-btn>
                     </v-card-actions>
                 </v-form>
             </v-card>
@@ -227,12 +259,12 @@
         <br>
         <v-data-table
         :headers="headers"
-        :items="reservations"
+        :items="transactions"
         hide-actions
         class="elevation-1"
         >
             <template slot="items" slot-scope="props">
-                <tr v-if="compareDate(props.item.checkindate) == 1" style="background:#FFD180">
+                <tr>
                     <td class="text-xs-center">{{ props.item.room.room_name }}</td>
                     <td class="text-xs-left">{{ props.item.guest.fullname }} ({{ props.item.guest.guest_type.guesttype }}) - {{ props.item.guest.company.companyname }}</td>
                     <td class="text-xs-left">{{ props.item.booking_type.bookingtype }}</td>
@@ -241,57 +273,12 @@
                     <td class="text-xs-left">{{ props.item.checkout }}</td>
                     <td class="text-xs-left">₱ {{ props.item.bookingcharge }}</td>
                     <td class="text-xs-left">₱ {{ props.item.billing.downpayment }}</td>
+                    <td class="text-xs-left">₱ {{ props.item.billing.totalcharges }}</td>
                     <td class="text-xs-left">{{ props.item.stayduration_days }}</td>
-                    <td class="justify-center layout px-0">
-                    <v-btn icon class="mx-0" @click="editItem(props.item)">
-                        <v-icon color="teal">edit</v-icon>
-                    </v-btn>
-                    <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                        <v-icon color="red accent-3">delete</v-icon>
-                    </v-btn>
-                    </td>
-                </tr>
-                <tr v-else-if="compareDate(props.item.checkindate) == -1" style="background:#FF8A80">
-                    <td class="text-xs-center">{{ props.item.room.room_name }}</td>
-                    <td class="text-xs-left">{{ props.item.guest.fullname }} ({{ props.item.guest.guest_type.guesttype }}) - {{ props.item.guest.company.companyname }}</td>
-                    <td class="text-xs-left">{{ props.item.booking_type.bookingtype }}</td>
-                    <td class="text-xs-left">{{ props.item.numberofpax }}</td>
-                    <td class="text-xs-left">{{ props.item.checkin }}</td>
-                    <td class="text-xs-left">{{ props.item.checkout }}</td>
-                    <td class="text-xs-left">₱ {{ props.item.bookingcharge }}</td>
-                    <td class="text-xs-left">₱ {{ props.item.billing.downpayment }}</td>
-                    <td class="text-xs-left">{{ props.item.stayduration_days }}</td>
-                    <td class="justify-center layout px-0">
-                    <v-btn icon class="mx-0" @click="editItem(props.item)">
-                        <v-icon color="teal">edit</v-icon>
-                    </v-btn>
-                    <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                        <v-icon color="red accent-3">delete</v-icon>
-                    </v-btn>
-                    </td>
-                </tr>
-                <tr v-else>
-                    <td class="text-xs-center">{{ props.item.room.room_name }}</td>
-                    <td class="text-xs-left">{{ props.item.guest.fullname }} ({{ props.item.guest.guest_type.guesttype }}) - {{ props.item.guest.company.companyname }}</td>
-                    <td class="text-xs-left">{{ props.item.booking_type.bookingtype }}</td>
-                    <td class="text-xs-left">{{ props.item.numberofpax }}</td>
-                    <td class="text-xs-left">{{ props.item.checkin }}</td>
-                    <td class="text-xs-left">{{ props.item.checkout }}</td>
-                    <td class="text-xs-left">₱ {{ props.item.bookingcharge }}</td>
-                    <td class="text-xs-left">₱ {{ props.item.billing.downpayment }}</td>
-                    <td class="text-xs-left">{{ props.item.stayduration_days }}</td>
-                    <td class="justify-center layout px-0">
-                    <v-btn icon class="mx-0" @click="editItem(props.item)">
-                        <v-icon color="teal">edit</v-icon>
-                    </v-btn>
-                    <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                        <v-icon color="red accent-3">delete</v-icon>
-                    </v-btn>
-                    </td>
                 </tr>
             </template>
             <template slot="no-data">
-                <td colspan="10" class="text-xs-center">There are no reservations to show.</td>
+                <td colspan="10" class="text-xs-center">There are no transactions to show.</td>
             </template>
         </v-data-table>
     </div>
@@ -351,12 +338,10 @@ export default {
             { text: 'Check-Out', value: 'checkout' },
             { text: 'Booking Charge', value: 'bookingcharge' },
             { text: 'Downpayment', value: 'billing.downpayment' },
+            { text: 'Total Charges', value: 'billing.totalcharges' },
             { text: 'Duration', value: 'stayduration_days' },
-            { text: 'Actions', value: 'name', sortable: false }
         ],
-        reservations: [],
-        editedIndex: -1,
-
+        transactions: [],
         editedItem: {
             billing: { downpayment: 0.00} 
         },
@@ -365,18 +350,11 @@ export default {
         },
         guests: [],
         rooms: [],
-        bookingtypes: [],
-        mindate: ''
+        bookingtypes: []
     }),
     beforeCreate() {
         auth.checkAuth()
     },
-    computed: {
-        formTitle () {
-            return this.editedIndex === -1 ? 'New Reservation' : 'Edit Reservation'
-        }
-    },
-
     watch: {
         dialog (val) {
             val || this.close()
@@ -384,39 +362,19 @@ export default {
     },
 
     created () {
-        this.getReservations()
+        this.getTransactions()
         this.getGuestInfo()
         this.getRoomInfo()
         this.getBookingTypes()
-        this.setDatePickerMinDate()
     },
 
     methods: {
-        compareDate(date) {
-
-            let currTime = new Date()
-            let refTime = new Date(date)
-            if(currTime.getMonth() + '-' + currTime.getDate() + '-' + currTime.getFullYear() === refTime.getMonth() + '-' + refTime.getDate() + '-' + refTime.getFullYear()) {
-                return 1
-            }
-
-            //get the timestamp (number of milliseconds since 01-01-1970)
-            currTime = new Date().getTime()
-            refTime = new Date(date).getTime()
-
-            if(currTime > refTime) {
-                return -1
-            }
-            else {
-                return 0
-            }
-        },
-        getReservations() {
-            //get all reservation information
-            axios.get('/api/reservations')
+        getTransactions() {
+            //get all transaction information
+            axios.get('/api/transactions')
             .then(response => {
                 if(response.data.message == undefined) {
-                    this.reservations = response.data
+                    this.transactions = response.data
                 }
             })
             .catch(error => {
@@ -461,25 +419,6 @@ export default {
                 console.log(error.message)
             })
         },
-        editItem(item) { //promp form dialog to edit item
-            this.editedIndex = this.reservations.indexOf(item)
-            this.editedItem = Object.assign({}, item)
-            this.dialog = true
-        },
-        deleteItem (item) {
-            const index = this.reservations.indexOf(item)
-            if(confirm('Are you sure you want to delete this item?')) {
-                this.reservations.splice(index, 1)
-                axios.delete('api/booking/' + item.id)
-                .then(response => {
-                    this.setAlert('info', response.data.message)
-                })
-                .catch(error => {
-                    console.log(error)
-                })
-            }
-            
-        },
         close () {
             this.$refs.reservationform.reset()
             this.dialog = false
@@ -489,52 +428,26 @@ export default {
             this.editedIndex = -1
             }, 300)
         },
-        saveReservation () {
+        saveTransaction () {
             if(this.$refs.reservationform.validate()) {
-                if(this.editedItem.id == undefined) { //If new reservation
-                    axios.post('api/reservation', this.editedItem)
-                    .then(response => {
-                        //Check for validation errors
-                        if(response.data.message) {
-                            this.close()
-                            this.getReservations()
-                            this.alert = true
-                            this.setAlert('success', response.data.message)
-                        }
-                        else {
-                            this.formvalidation = true
-                            this.validationerrors = response.data
-                        }
-                    })
-                    .catch(error => {
-                        alert(error.message)
-                    })      
-                }
-                else { //If rervation detail will be updated
-                    axios.patch('api/reservation/' + this.editedItem.id, this.editedItem)
-                    .then(response => {
-                        if(response.data.message) {
-                            this.close()
-                            this.getReservations()
-                            this.setAlert('success', response.data.message)
-                        }
-                        else {
-                            this.formvalidation = true
-                            this.validationerrors = response.data
-                        }
-                    })
-                    .catch(error => {
-                        alert(error.message)
-                    })
-                }
+                axios.post('api/transaction', this.editedItem)
+                .then(response => {
+                    //Check for validation errors
+                    if(response.data.message) {
+                        this.close()
+                        this.getTransactions()
+                        this.alert = true
+                        this.setAlert('success', response.data.message)
+                    }
+                    else {
+                        this.formvalidation = true
+                        this.validationerrors = response.data
+                    }
+                })
+                .catch(error => {
+                    alert(error.message)
+                })   
             }  
-        },
-        setDatePickerMinDate() {
-            //Set minimum date for reservation
-            //cannot reserve current date
-            var today = new Date()
-            var mindate = new Date(today.getTime() + (24 * 60 * 60 * 1000));
-            this.mindate = mindate.toISOString().substr(0,10)
         },
         setAlert(type, message) {
             this.alert = true

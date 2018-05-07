@@ -111,6 +111,7 @@
                                     <v-text-field 
                                         prefix="₱"
                                         label="Booking Charge" 
+                                        id="bookingcharge"
                                         v-model="bookingInfo.bookingcharge"
                                         type="number"
                                         required
@@ -177,7 +178,8 @@ export default {
                 v => !!v || 'Booking charge is required'
             ],
             downpaymentRules: [
-                v => !!v || 'Downpayment is required'
+                v => !!v || 'Downpayment is required',
+                v => parseFloat(v) <= parseFloat(bookingcharge.value) || 'Downpayment must not exceed Booking Charge'
             ],
             formvalidation: false,
             validationerrors: '',

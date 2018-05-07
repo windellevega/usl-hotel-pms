@@ -97,6 +97,7 @@ export default {
                     text: 'Information Manager',
                     model: true,
                     children: [
+                        { icon: 'list', text: 'Transactions', route: '/transactions', active: false },
                         { icon: 'people', text: 'Guests', route: '/guests', active: false },
                         { icon: 'style', text: 'Rooms', route: '/rooms', active: false },
                         { icon: 'lock', text: 'Accounts', route: '/accounts', active: false }

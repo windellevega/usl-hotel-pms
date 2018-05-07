@@ -6,6 +6,8 @@ import router from './router'
 import Vuetify from 'vuetify'
 import 'vuetify/dist/vuetify.min.css'
 import 'font-awesome/css/font-awesome.css';
+import 'material-icons/css/material-icons.css';
+import 'roboto-fontface/css/roboto/roboto-fontface.css';
 
 
 

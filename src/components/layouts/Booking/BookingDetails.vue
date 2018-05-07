@@ -353,6 +353,7 @@ export default {
             }
         },
         checkout() {
+            window.open('http://192.168.0.18/api/invoice/' + this.roomid, '_blank');
             axios.patch('/api/booking/check-out/' + this.bookingdetails.id, {
                 room_id: this.roomid,
                 roomstatus: this.roomstatus
@@ -366,7 +367,6 @@ export default {
             .catch(error => {
                 console.log(error)
             })
-            window.open('http://localhost:8000/api/invoice', '_blank');
         },
         modifyBookingCharge() {
             if(this.$refs.bookingchargeform.validate()) {
